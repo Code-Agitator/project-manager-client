@@ -18,10 +18,33 @@ const editModalMode = ref<number>(1)
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
 })
+const queryForm = ref<RoleSearchParam>({})
 
+const initTableData = () => {
+  loading.value = true
+  queryForm.value.pageSize = pagination.pageSize
+  queryForm.value.pageNumber = pagination.page
+  api.searchRole({ ...queryForm.value }).then((res) => {
+    tableData.value = res.data?.records as RowData[]
+    pagination.page = res.data?.current
+    pagination.pageCount = res.data?.pages
+    pagination.itemCount = res.data?.total
+  }).finally(() => loading.value = false)
+}
 interface RowData extends Role {
 }
-
+const handleDeleteRole = async (id?: number) => {
+  if (id === undefined)
+    return
+  try {
+    await api.deleteRole({ id })
+    window.$message?.success('删除成功')
+    initTableData()
+  }
+  catch (e) {
+    window.$message?.error('删除失败')
+  }
+}
 const columns: DataTableColumns<RowData> = [
   { title: '角色编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
   { title: '角色名称', key: 'roleName', width: 150, ellipsis: { tooltip: true } },
@@ -39,6 +62,7 @@ const columns: DataTableColumns<RowData> = [
             tertiary: true,
             size: 'small',
             onClick: () => {
+              editModalMode.value = 2
               editModal.value = row
               showEditModal.value = true
             },
@@ -60,19 +84,6 @@ const columns: DataTableColumns<RowData> = [
     },
   },
 ]
-const queryForm = ref<RoleSearchParam>({})
-
-const initTableData = () => {
-  loading.value = true
-  queryForm.value.pageSize = pagination.pageSize
-  queryForm.value.pageNumber = pagination.page
-  api.searchRole({ ...queryForm.value }).then((res) => {
-    tableData.value = res.data?.records as RowData[]
-    pagination.page = res.data?.current
-    pagination.pageCount = res.data?.pages
-    pagination.itemCount = res.data?.total
-  }).finally(() => loading.value = false)
-}
 
 const handelSaveBtnClick = async () => {
   try {
@@ -86,19 +97,6 @@ const handelSaveBtnClick = async () => {
   }
   catch (e) {
     window.$message?.error('修改失败')
-  }
-}
-
-const handleDeleteRole = async (id?: number) => {
-  if (id === undefined)
-    return
-  try {
-    await api.deleteRole({ id })
-    window.$message?.success('删除成功')
-    initTableData()
-  }
-  catch (e) {
-    window.$message?.error('删除失败')
   }
 }
 
@@ -127,17 +125,18 @@ onMounted(() => {
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
             </NButton>
-            <NButton
-              ml="10" type="primary"
-              @click="() => {
-                editModal = {}
-                showEditModal = true
-              }"
-            >
-              + 新增
-            </NButton>
           </n-form-item-gi>
         </n-grid>
+        <NButton
+          ml="10" type="primary"
+          @click="() => {
+            editModalMode = 1
+            editModal = {}
+            showEditModal = true
+          }"
+        >
+          + 新增
+        </NButton>
       </n-form>
     </div>
 

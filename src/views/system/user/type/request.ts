@@ -5,6 +5,7 @@ export interface UserSearchParam extends BasePageParam {
   startDate?: string
   endDate?: string
   name?: string
+  username?: string
   phone?: string
   roleId?: number
   status?: number
