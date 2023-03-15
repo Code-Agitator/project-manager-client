@@ -3,5 +3,5 @@ import type { UserSearchParam } from '@/views/system/user/type/request'
 import type { UserVo } from '@/views/system/user/type/response'
 import type { ResponsePage } from '~/types/http'
 export default {
-  searchUser: (param: UserSearchParam) => http.get<UserSearchParam, ResponsePage<UserVo>>('/user/search', param),
+  searchUser: (param: UserSearchParam) => http.post<UserSearchParam, ResponsePage<UserVo>>('/user/search', param),
 }

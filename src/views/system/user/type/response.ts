@@ -1,44 +1,9 @@
 /**
  * UserVo
  */
-export interface UserVo {
-  createTime?: Date
+export interface UserVo extends User {
   department?: Department
-  /**
-   * 部门id
-   */
-  departmentId?: number
-  /**
-   * 邮箱
-   */
-  email?: string
-  id?: number
-  /**
-   * 工号
-   */
-  no?: string
-  password?: string
-  /**
-   * 手机号码
-   */
-  phone?: string
   role?: Role
-  /**
-   * 角色id
-   */
-  roleId?: number
-  /**
-   * 座位
-   */
-  seat?: string
-  /**
-   * 0-离职 1-在职 2-实习生
-   */
-  status?: number
-  /**
-   * 姓名
-   */
-  username?: string
 }
 
 /**
@@ -73,4 +38,47 @@ export interface Role {
    * 角色名称
    */
   roleName?: string
+}
+
+/**
+ * User
+ */
+export interface User {
+  createTime?: Date
+  /**
+   * 部门id
+   */
+  departmentId?: number
+  /**
+   * 邮箱
+   */
+  email?: string
+  id?: number
+  /**
+   * 工号
+   */
+  no?: string
+  password?: string
+  /**
+   * 手机号码
+   */
+  phone?: string
+  /**
+   * 角色id
+   */
+  roleId?: number
+  /**
+   * 座位
+   */
+  seat?: string
+  /**
+   * 0-离职 1-在职 2-实习生
+   */
+  status?: number
+  /**
+   * 姓名
+   */
+  username?: string
+
+  name?: string
 }

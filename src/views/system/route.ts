@@ -24,6 +24,16 @@ export default {
         role: ['admin'],
         requireAuth: true,
       },
+    }, {
+      name: 'Department',
+      path: 'department',
+      component: () => import('@/views/system/department/index.vue'),
+      meta: {
+        title: '部门管理',
+        icon: 'logos:unocss',
+        role: ['admin'],
+        requireAuth: true,
+      },
     },
   ],
 } as RouteType
