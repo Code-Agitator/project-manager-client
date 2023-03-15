@@ -146,12 +146,36 @@ onMounted(() => {
         label-placement="left"
         :model="queryForm"
       >
-        <n-grid :cols="4" :x-gap="24">
+        <n-grid :cols="1" :x-gap="24">
           <n-form-item-gi
             path="keywords"
             label="名称"
           >
             <n-input v-model:value="queryForm.name" />
+            <n-input v-model:value="queryForm.phone" ml="10" placeholder="手机号码" />
+            <n-select
+              v-model:value="queryForm.status" ml="10"
+              :options="[
+                { label: '离职', value: 0 }, { label: '在职', value: 1 }, { label: '实习生', value: 2 },
+              ]"
+              placeholder="请选择用户状态"
+            />
+            <n-date-picker
+              v-model:value="queryForm.startDate" ml="10" type="datetime"
+              placeholder="请选择开始时间"
+              clearable
+              @confirm="(startDate) => {
+                queryForm.startDate = startDate
+              }"
+            />
+            <n-date-picker
+              v-model:value="queryForm.endDate" ml="10" type="datetime"
+              placeholder="请选择结束时间"
+              clearable
+              @confirm="(endDate) => {
+                queryForm.endDate = endDate
+              }"
+            />
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
             </NButton>
