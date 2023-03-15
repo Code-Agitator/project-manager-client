@@ -35,5 +35,16 @@ export default {
         requireAuth: true,
       },
     },
+    {
+      name: 'Role',
+      path: 'role',
+      component: () => import('@/views/system/role/index.vue'),
+      meta: {
+        title: '角色管理',
+        icon: 'logos:unocss',
+        role: ['admin'],
+        requireAuth: true,
+      },
+    },
   ],
 } as RouteType
