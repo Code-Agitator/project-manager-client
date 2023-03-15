@@ -4,7 +4,7 @@ import { NButton, NSwitch } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
 import { renderIcon, timeFormat } from '@/utils/common'
 import api from '@/views/system/department/api'
-import type { UserVo } from '@/views/system/user/type/response'
+import type { Department, User, UserVo } from '@/views/system/user/type/response'
 import type { UserSearchParam } from '@/views/system/user/type/request'
 import type { DepartmentSearchParam } from '@/views/system/department/type/request'
 import type { DepartmentVo } from '@/views/system/department/type/response'
@@ -12,8 +12,9 @@ import type { DepartmentVo } from '@/views/system/department/type/response'
 const modalForm = ref<DepartmentSearchParam>({})
 const tableData = ref<RowData[]>([])
 const showEditModal = ref<boolean>(false)
-const editModal = ref<DepartmentVo>({})
+const editModal = ref< DepartmentVo>({})
 const loading = ref<boolean>(false)
+const editModalMode = ref<number>(1)
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
 })
@@ -30,7 +31,11 @@ const columns: DataTableColumns<RowData> = [
 
 ]
 const queryForm = ref<UserSearchParam>({})
-
+const toShowEditModel = () => {
+  if (editModalMode.value === 1)
+    editModal.value = {}
+  showEditModal.value = true
+}
 const initTableData = () => {
   loading.value = true
   queryForm.value.pageSize = pagination.pageSize
@@ -73,7 +78,7 @@ onMounted(() => {
           </NButton>
         </n-form-item>
         <n-form-item float-right>
-          <NButton type="primary" @click="showEditModal = true;">
+          <NButton type="primary" @click="editModal = 1;toShowEditModel()">
             新增
           </NButton>
         </n-form-item>
@@ -96,34 +101,11 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="model">
-          <n-grid :cols="24" :x-gap="8">
-            <n-form-item-gi :span="12" path="name" label="名称">
-              <n-input v-model:value="model.name" @keydown.enter.prevent />
-            </n-form-item-gi>
-            <n-form-item-gi :span="12" path="age" label="年龄">
-              <n-input-number v-model:value="model.age" class="w-100" :show-button="false" @keydown.enter.prevent />
-            </n-form-item-gi>
-          </n-grid>
-          <n-grid :cols="24" :x-gap="8">
-            <n-form-item-gi :span="12" path="phone" label="联系电话">
-              <n-input v-model:value="model.phone" @keydown.enter.prevent />
-            </n-form-item-gi>
-          </n-grid>
-          <n-grid :cols="24" :x-gap="8">
-            <n-form-item-gi :span="10" label="详细地址">
-              <n-cascader
-                v-model:value="model.areaCode"
-                placeholder="选择地址"
-                :options="options"
-                check-strategy="child"
-                :show-path="true"
-              />
-            </n-form-item-gi>
-            <n-form-item-gi :span="14">
-              <n-input v-model:value="model.address" @keydown.enter.prevent />
-            </n-form-item-gi>
-          </n-grid>
+        <n-form ref="formRef" :model="editModal">
+          <n-form-item path="name" label="名称">
+            <n-input v-model:value="editModal.name" @keydown.enter.prevent />
+          </n-form-item>
+          <n-form-item label="主管信息" />
           <n-row :gutter="[0, 24]">
             <n-col :span="24">
               <div style="display: flex; justify-content: flex-end">
