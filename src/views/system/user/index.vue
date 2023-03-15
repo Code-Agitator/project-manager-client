@@ -7,6 +7,7 @@ import api from '@/views/system/user/api'
 import type { UserListVo } from '@/views/user/user/type/response'
 import type { GetUserListParam } from '@/views/user/user/type/request'
 import type { UserVo } from '@/views/system/user/type/response'
+import type { UserSearchParam } from '@/views/system/user/type/request'
 
 const modalForm = ref<UserListVo>({})
 const tableData = ref<RowData[]>([])
@@ -26,12 +27,19 @@ interface RowData extends UserVo {
 function handleLockUser(row: RowData) {
 
 }
+const status: { [key: number]: string } = {
+  0: '离职',
+  1: '在职',
+  2: '实习生',
+}
 
 const columns: DataTableColumns<RowData> = [
-
   { title: '用户编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
   { title: '用户名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
   { title: '用户昵称', key: 'username', width: 150, ellipsis: { tooltip: true } },
+  { title: '部门', key: 'departmentId', width: 150, render: row => row.department?.name },
+  { title: '手机号码', key: 'phone', width: 150, ellipsis: { tooltip: true } },
+  { title: '状态', key: 'status', width: 150, ellipsis: { tooltip: true }, render: row => row.status && status[row.status] },
   {
     title: '创建时间',
     key: 'createdTime',
@@ -42,7 +50,7 @@ const columns: DataTableColumns<RowData> = [
     },
   },
 ]
-const queryForm = ref<GetUserListParam>({})
+const queryForm = ref<UserSearchParam>({})
 
 const initTableData = () => {
   loading.value = true

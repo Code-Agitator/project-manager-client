@@ -52,20 +52,14 @@ async function handleLogin() {
         removeLocal('loginInfo')
 
       await addDynamicRoutes()
-      const path = query.redirect as string
-      window.location.href = `${path ?? '/'}`
-      // await router.push('/')
-      // if (query.redirect) {
-      //   const path = query.redirect as string
-      //   Reflect.deleteProperty(query, 'redirect')
-      //   // await router.push({ path, query })
-      //   console.log(path, route.query);
-      //   // window.location.href = `/${path}`
-      // }
-      // else {
-      //   await router.push('/')
-      //   // window.location.href = '/'
-      // }
+      if (query.redirect) {
+        const path = query.redirect as string
+        Reflect.deleteProperty(query, 'redirect')
+        await router.push({ path, query })
+      }
+      else {
+        await router.push('/')
+      }
     }
     else {
       window.$message?.warning(res.message)
