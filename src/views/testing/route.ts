@@ -25,8 +25,8 @@ export default {
         requireAuth: true,
       },
     }, {
-      name: 'Department',
-      path: 'department',
+      name: 'Defect',
+      path: 'defect',
       component: () => import('@/views/testing/defect/index.vue'),
       meta: {
         title: '缺陷管理',
@@ -36,8 +36,8 @@ export default {
       },
     },
     {
-      name: 'Role',
-      path: 'role',
+      name: 'Case',
+      path: 'case',
       component: () => import('@/views/testing/case/index.vue'),
       meta: {
         title: '用例管理',
