@@ -10,7 +10,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --open",
     "build": "vite build",
     "build:github": "vite build --mode github",
     "preview": "vite preview",
@@ -20,11 +20,13 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@types/md5": "^2.3.2",
     "@vueuse/core": "^8.9.4",
     "axios": "^0.27.2",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.3",
     "lodash-es": "^4.17.21",
+    "md5": "^2.3.0",
     "mockjs": "^1.1.0",
     "moment": "^2.29.4",
     "pinia": "^2.0.16",

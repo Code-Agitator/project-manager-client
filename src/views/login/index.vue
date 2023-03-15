@@ -6,6 +6,7 @@ import { setToken } from '@/utils/auth/token'
 import { getLocal, removeLocal, setLocal } from '@/utils/storage'
 import bgImg from '@/assets/images/login_bg.webp'
 import { addDynamicRoutes } from '@/router'
+import md5 from 'md5'
 
 const title: string = import.meta.env.VITE_APP_TITLE
 
@@ -39,24 +40,32 @@ async function handleLogin() {
   }
   try {
     loging.value = true
-    const res = await api.login({ username: name, password: password.toString() })
+    const res = await api.login({ email: name, password: md5(password.toString()) })
     if (res.code === 200) {
       window.$notification?.success({ title: '登录成功！', duration: 2500 })
-      res.data && setToken(res.data.accessToken)
+      // res.data && setToken(res.data.accessToken)
+      // setLocal('userInfo', res.data)
+      localStorage.setItem('userInfo', JSON.stringify(res.data))
       if (isRemember.value)
         setLocal('loginInfo', { name, password })
       else
         removeLocal('loginInfo')
 
       await addDynamicRoutes()
-      if (query.redirect) {
-        const path = query.redirect as string
-        Reflect.deleteProperty(query, 'redirect')
-        await router.push({ path, query })
-      }
-      else {
-        await router.push('/')
-      }
+      const path = query.redirect as string
+      window.location.href = `${path ?? '/'}`
+      // await router.push('/')
+      // if (query.redirect) {
+      //   const path = query.redirect as string
+      //   Reflect.deleteProperty(query, 'redirect')
+      //   // await router.push({ path, query })
+      //   console.log(path, route.query);
+      //   // window.location.href = `/${path}`
+      // }
+      // else {
+      //   await router.push('/')
+      //   // window.location.href = '/'
+      // }
     }
     else {
       window.$message?.warning(res.message)
@@ -64,6 +73,7 @@ async function handleLogin() {
   }
   catch (error: any) {
     window.$message?.error(error.message)
+    console.error(error)
   }
   loging.value = false
 }

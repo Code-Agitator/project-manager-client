@@ -1,7 +1,7 @@
 const proxyConfigMappings: Record<ProxyType, ProxyConfig> = {
   dev: {
     prefix: '/service',
-    target: 'http://localhost:8887/service',
+    target: 'http://localhost:8880/service',
   },
   test: {
     prefix: '/api',

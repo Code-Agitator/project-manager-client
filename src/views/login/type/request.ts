@@ -10,5 +10,5 @@ export interface UserLoginParam {
     /**
      * 用户名
      */
-    username?: string;
+    email?: string;
 }

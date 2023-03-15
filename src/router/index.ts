@@ -24,10 +24,12 @@ export async function resetRouter() {
 }
 
 export async function addDynamicRoutes() {
-  const token = getToken()
+  // const token = getToken()
+  const userInfo = localStorage.getItem('userInfo')
 
   // 没有token情况
-  if (isNullOrWhitespace(token)) {
+  // if (isNullOrWhitespace(token)) {
+  if (!userInfo) {
     router.addRoute(EMPTY_ROUTE)
     return
   }
