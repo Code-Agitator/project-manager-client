@@ -4,6 +4,7 @@ import { NButton, NSwitch } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
 import { renderIcon, timeFormat } from '@/utils/common'
 import api from '@/views/system/department/api'
+import userApi from '@/views/system/user/api'
 import type { Department, User, UserVo } from '@/views/system/user/type/response'
 import type { UserSearchParam } from '@/views/system/user/type/request'
 import type { DepartmentSearchParam } from '@/views/system/department/type/request'
@@ -15,6 +16,12 @@ const showEditModal = ref<boolean>(false)
 const editModal = ref< DepartmentVo>({})
 const loading = ref<boolean>(false)
 const editModalMode = ref<number>(1)
+const selectedUserName = ref<string>('')
+const options = computed(() => {
+ userApi.searchUser({ name: selectedUserName.value }).then(res=>{
+
+ })
+})
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
 })
@@ -105,7 +112,22 @@ onMounted(() => {
           <n-form-item path="name" label="名称">
             <n-input v-model:value="editModal.name" @keydown.enter.prevent />
           </n-form-item>
-          <n-form-item label="主管信息" />
+          <n-form-item>
+            <n-auto-complete v-model:value="editModal.userId" :options="options">
+              <template
+                #default="{ handleInput }"
+              >
+                <n-input
+                  :value="selectedUserName"
+                  placeholder="选择主管"
+                  @input="handleInput"
+                />
+              </template>
+            </n-auto-complete>
+          </n-form-item>
+          <n-form-item label="主管信息">
+            {{ editModal.user ? `编号: ${editModal.user.no} 主管名称: ${editModal.user.name}` : '请选择主管' }}
+          </n-form-item>
           <n-row :gutter="[0, 24]">
             <n-col :span="24">
               <div style="display: flex; justify-content: flex-end">
