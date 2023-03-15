@@ -13,15 +13,18 @@ import type { DepartmentVo } from '@/views/system/department/type/response'
 const modalForm = ref<DepartmentSearchParam>({})
 const tableData = ref<RowData[]>([])
 const showEditModal = ref<boolean>(false)
-const editModal = ref< DepartmentVo>({})
+const editModal = ref<DepartmentVo>({})
 const loading = ref<boolean>(false)
 const editModalMode = ref<number>(1)
 const selectedUserName = ref<string>('')
-const options = computed(() => {
- userApi.searchUser({ name: selectedUserName.value }).then(res=>{
+const searchUserResult = ref<UserVo[]>([])
+const autoCompleteOptions = computed(() => searchUserResult.value?.map((user) => {
+  return {
+    label: user.username,
+    value: user.id,
+  }
+}) ?? [])
 
- })
-})
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
 })
@@ -77,18 +80,20 @@ onMounted(() => {
             label="部门名称"
           >
             <n-input v-model:value="queryForm.keywords" />
+            <NButton ml="10" type="primary" @click="initTableData">
+              搜索
+            </NButton>
+            <NButton
+              ml="10" type="primary"
+              @click="() => {
+                editModal = 1
+                toShowEditModel()
+              }"
+            >
+              + 新增
+            </NButton>
           </n-form-item-gi>
         </n-grid>
-        <n-form-item float-right>
-          <NButton type="primary" @click="initTableData">
-            搜索
-          </NButton>
-        </n-form-item>
-        <n-form-item float-right>
-          <NButton type="primary" @click="editModal = 1;toShowEditModel()">
-            新增
-          </NButton>
-        </n-form-item>
       </n-form>
     </div>
 
@@ -113,14 +118,23 @@ onMounted(() => {
             <n-input v-model:value="editModal.name" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item>
-            <n-auto-complete v-model:value="editModal.userId" :options="options">
+            <n-auto-complete
+              v-model:value="selectedUserName" :options="autoCompleteOptions"
+            >
               <template
-                #default="{ handleInput }"
+                #default="{ handleInput, value: slotValue }"
               >
                 <n-input
-                  :value="selectedUserName"
+                  :value="slotValue"
                   placeholder="选择主管"
-                  @input="handleInput"
+                  @input="(name) => {
+                    userApi.searchUser({ name }).then((res) => {
+                      searchUserResult = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResult = []
+                    })
+                    handleInput(name)
+                  }"
                 />
               </template>
             </n-auto-complete>
