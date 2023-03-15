@@ -52,6 +52,7 @@ export const useUserStore = defineStore('user', {
     },
     async logout() {
       removeToken()
+      localStorage.removeItem('userInfo')
       this.userInfo = {}
       toLogin()
     },
