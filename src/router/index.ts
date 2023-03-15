@@ -2,8 +2,6 @@ import type { App } from 'vue'
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import { setupRouterGuard } from './guard'
 import { EMPTY_ROUTE, NOT_FOUND_ROUTE, basicRoutes as routes } from './routes'
-import { getToken } from '@/utils/auth/token'
-import { isNullOrWhitespace } from '@/utils/common'
 import { usePermissionStore, useUserStore } from '@/store'
 import type { RouteType } from '~/types/router'
 
