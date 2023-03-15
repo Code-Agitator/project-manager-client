@@ -4,9 +4,11 @@ import { NButton, NSwitch } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
 import { renderIcon, timeFormat } from '@/utils/common'
 import api from '@/views/system/user/api'
+import departmentApi from '@/views/system/department/api'
 import type { User, UserVo } from '@/views/system/user/type/response'
 import type { UserSearchParam } from '@/views/system/user/type/request'
 import type { RoleSaveData } from '@/views/system/role/type/request'
+import type { DepartmentVo } from '@/views/system/department/type/response'
 
 const editModalMode = ref<number>(1)
 const tableData = ref<RowData[]>([])
@@ -40,7 +42,7 @@ const initTableData = () => {
     pagination.page = res.data?.current
     pagination.pageCount = res.data?.pages
     pagination.itemCount = res.data?.total
-  }).finally(() => loading.value = false)
+  }).finally(() => { loading.value = false })
 }
 const handleDeleteUser = async (id?: number) => {
   if (id === undefined)
@@ -120,6 +122,14 @@ const handelSaveBtnClick = async () => {
     window.$message?.error('修改失败')
   }
 }
+
+const departmentList = ref<DepartmentVo[]>([])
+const getDepartmentList = async () => {
+  const { data } = await departmentApi.searchDepartment({})
+  departmentList.value = data?.records ?? []
+}
+getDepartmentList()
+
 onMounted(() => {
   initTableData()
   pagination.onUpdatePage = (page) => {
@@ -150,7 +160,7 @@ onMounted(() => {
         <NButton
           ml="10" type="primary"
           @click="() => {
-            editModalMode= 1
+            editModalMode = 1
             editModal = {}
             showEditModal = true
           }"
@@ -185,6 +195,12 @@ onMounted(() => {
           </n-form-item>
           <n-form-item path="username" label="昵称">
             <n-input v-model:value="editModal.username" @keydown.enter.prevent />
+          </n-form-item>
+          <n-form-item path="roleId" label="部门">
+            <n-select
+              v-model:value="editModal.departmentId"
+              :options="departmentList.map(department => ({ label: department.name, value: department.id }))"
+            />
           </n-form-item>
           <n-form-item path="roleId" label="角色">
             <n-select
