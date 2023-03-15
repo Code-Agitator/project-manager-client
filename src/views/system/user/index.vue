@@ -146,13 +146,11 @@ onMounted(() => {
         label-placement="left"
         :model="queryForm"
       >
-        <n-grid :cols="1" :x-gap="24">
-          <n-form-item-gi
-            path="keywords"
-            label="名称"
-          >
+        <n-grid :cols="5" :x-gap="24">
+          <n-form-item-gi label="名称">
             <n-input v-model:value="queryForm.name" />
-            <n-input v-model:value="queryForm.phone" ml="10" placeholder="手机号码" />
+          </n-form-item-gi>
+          <n-form-item-gi label="用户状态">
             <n-select
               v-model:value="queryForm.status" ml="10"
               :options="[
@@ -160,6 +158,11 @@ onMounted(() => {
               ]"
               placeholder="请选择用户状态"
             />
+          </n-form-item-gi>
+          <n-form-item-gi label="手机号码">
+            <n-input v-model:value="queryForm.phone" ml="10" placeholder="手机号码" />
+          </n-form-item-gi>
+          <n-form-item-gi>
             <n-date-picker
               v-model:value="queryForm.startDate" ml="10" type="datetime"
               placeholder="请选择开始时间"
@@ -176,6 +179,9 @@ onMounted(() => {
                 queryForm.endDate = endDate
               }"
             />
+          </n-form-item-gi>
+
+          <n-form-item-gi>
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
             </NButton>

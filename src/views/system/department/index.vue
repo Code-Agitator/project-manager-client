@@ -32,20 +32,7 @@ const pagination = reactive<PaginationProps>({
 interface RowData extends DepartmentVo {
 
 }
-
-const columns: DataTableColumns<RowData> = [
-  { title: '部门编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
-  { title: '部门名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
-  { title: '主管工号', key: 'userId', render: row => row.user?.no, width: 150, ellipsis: { tooltip: true } },
-  { title: '主管名称', key: 'userId', render: row => row.user?.username, width: 150, ellipsis: { tooltip: true } },
-
-]
 const queryForm = ref<UserSearchParam>({})
-const toShowEditModel = () => {
-  if (editModalMode.value === 1)
-    editModal.value = {}
-  showEditModal.value = true
-}
 const initTableData = () => {
   loading.value = true
   queryForm.value.pageSize = pagination.pageSize
@@ -57,7 +44,83 @@ const initTableData = () => {
     pagination.itemCount = res.data?.total
   }).finally(() => loading.value = false)
 }
+const handleDeleteDepartment = async (id?: number) => {
+  if (id === undefined)
+    return
+  try {
+    await api.deleteDepartment(id)
+    window.$message?.success('删除成功')
+    initTableData()
+  }
+  catch (e) {
+    window.$message?.error('删除失败')
+  }
+}
+const columns: DataTableColumns<RowData> = [
+  { title: '部门编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
+  { title: '部门名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
+  { title: '主管工号', key: 'userId', render: row => row.user?.no, width: 150, ellipsis: { tooltip: true } },
+  { title: '主管名称', key: 'userId', render: row => row.user?.username, width: 150, ellipsis: { tooltip: true } },
+  {
+    title: '操作',
+    key: 'actions',
+    width: 100,
+    render(row) {
+      return [
+        h(
+          NButton,
+          {
+            strong: true,
+            tertiary: true,
+            size: 'small',
+            onClick: () => {
+              editModalMode.value = 2
+              editModal.value = row
+              showEditModal.value = true
+              row.user?.name && (selectedUserName.value = row.user.name)
+            },
+          },
+          { default: () => '修改' },
+        ),
+        h(
+          NButton,
+          {
+            strong: true,
+            tertiary: true,
+            size: 'small',
+            style: { marginLeft: '10px' },
+            onClick: () => handleDeleteDepartment(row.id),
+          },
+          { default: () => '删除' },
+        ),
+      ]
+    },
+  },
+]
 
+const toShowEditModel = () => {
+  if (editModalMode.value === 1)
+    editModal.value = {}
+  showEditModal.value = true
+}
+
+const selected = (str: number) => {
+  editModal.value.userId = str
+}
+const handelSaveBtnClick = async () => {
+  try {
+    if (editModalMode.value === 1)
+      await api.saveDepartment(editModal.value)
+    else
+      await api.updateDepartment(editModal.value)
+    window.$message?.success('修改成功')
+    showEditModal.value = false
+    initTableData()
+  }
+  catch (e) {
+    window.$message?.error('修改失败')
+  }
+}
 onMounted(() => {
   initTableData()
   pagination.onUpdatePage = (page) => {
@@ -83,17 +146,17 @@ onMounted(() => {
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
             </NButton>
-            <NButton
-              ml="10" type="primary"
-              @click="() => {
-                editModal = 1
-                toShowEditModel()
-              }"
-            >
-              + 新增
-            </NButton>
           </n-form-item-gi>
         </n-grid>
+        <NButton
+          ml="10" type="primary"
+          @click="() => {
+            editModal = 1
+            toShowEditModel()
+          }"
+        >
+          + 新增
+        </NButton>
       </n-form>
     </div>
 
@@ -117,9 +180,10 @@ onMounted(() => {
           <n-form-item path="name" label="名称">
             <n-input v-model:value="editModal.name" @keydown.enter.prevent />
           </n-form-item>
-          <n-form-item>
+          <n-form-item path="userId" label="部门主管">
             <n-auto-complete
               v-model:value="selectedUserName" :options="autoCompleteOptions"
+              @select="selected"
             >
               <template
                 #default="{ handleInput, value: slotValue }"
@@ -139,9 +203,7 @@ onMounted(() => {
               </template>
             </n-auto-complete>
           </n-form-item>
-          <n-form-item label="主管信息">
-            {{ editModal.user ? `编号: ${editModal.user.no} 主管名称: ${editModal.user.name}` : '请选择主管' }}
-          </n-form-item>
+
           <n-row :gutter="[0, 24]">
             <n-col :span="24">
               <div style="display: flex; justify-content: flex-end">

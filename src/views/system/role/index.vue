@@ -117,11 +117,13 @@ onMounted(() => {
         :model="queryForm"
       >
         <n-grid :cols="4" :x-gap="24">
-          <n-form-item-gi
-            path="keywords"
-            label="关键词"
-          >
+          <n-form-item-gi path="roleName" label="角色名称">
             <n-input v-model:value="queryForm.roleName" />
+          </n-form-item-gi>
+          <n-form-item-gi path="keywords" label="角色编码">
+            <n-input v-model:value="queryForm.roleCode" />
+          </n-form-item-gi>
+          <n-form-item-gi>
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
             </NButton>
