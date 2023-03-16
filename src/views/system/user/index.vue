@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { DataTableColumns } from 'naive-ui'
-import { NButton, NSwitch } from 'naive-ui'
+import { NButton, NInput, NSwitch, useDialog } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
+import md5 from 'md5'
 import { renderIcon, timeFormat } from '@/utils/common'
 import api from '@/views/system/user/api'
 import departmentApi from '@/views/system/department/api'
@@ -44,6 +45,7 @@ const initTableData = () => {
     pagination.itemCount = res.data?.total
   }).finally(() => { loading.value = false })
 }
+
 const handleDeleteUser = async (id?: number) => {
   if (id === undefined)
     return
@@ -56,6 +58,7 @@ const handleDeleteUser = async (id?: number) => {
     window.$message?.error('删除失败')
   }
 }
+const dialog = useDialog()
 const columns: DataTableColumns<RowData> = [
   { title: '用户编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
   { title: '用户名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
@@ -75,7 +78,7 @@ const columns: DataTableColumns<RowData> = [
   {
     title: '操作',
     key: 'actions',
-    width: 100,
+    width: 200,
     render(row) {
       return [
         h(
@@ -84,6 +87,43 @@ const columns: DataTableColumns<RowData> = [
             strong: true,
             tertiary: true,
             size: 'small',
+            type: 'error',
+            onClick: () => {
+              const pwd = ref('')
+              dialog.warning({
+                title: '修改密码',
+                positiveText: '确定',
+                onPositiveClick: async () => {
+                  pwd.value && await api.updateUser({
+                    id: row.id,
+                    password: md5(pwd.value),
+                  }).then(() => {
+                    window.$message?.success('修改成功')
+                  }).catch(() => {
+                    window.$message?.error('修改失败')
+                  })
+                },
+                content: () => h(
+                  NInput,
+                  {
+                    placeholder: '请输入密码',
+                    value: pwd.value,
+                    type: 'password',
+                    onInput: value => pwd.value = value,
+                  },
+                ),
+              })
+            },
+          },
+          { default: () => '修改密码' },
+        ),
+        h(
+          NButton,
+          {
+            strong: true,
+            tertiary: true,
+            size: 'small',
+            style: { marginLeft: '10px' },
             onClick: () => {
               editModalMode.value = 2
               editModal.value = row
@@ -148,7 +188,7 @@ onMounted(() => {
       >
         <n-grid :cols="5" :x-gap="24">
           <n-form-item-gi label="名称">
-            <n-input v-model:value="queryForm.name" />
+            <NInput v-model:value="queryForm.name" />
           </n-form-item-gi>
           <n-form-item-gi label="用户状态">
             <n-select
@@ -160,7 +200,7 @@ onMounted(() => {
             />
           </n-form-item-gi>
           <n-form-item-gi label="手机号码">
-            <n-input v-model:value="queryForm.phone" ml="10" placeholder="手机号码" />
+            <NInput v-model:value="queryForm.phone" ml="10" placeholder="手机号码" />
           </n-form-item-gi>
           <n-form-item-gi>
             <n-date-picker
@@ -218,13 +258,13 @@ onMounted(() => {
       >
         <n-form ref="formRef" :model="editModal">
           <n-form-item v-if="editModalMode !== 1" path="no" label="工号">
-            <n-input v-model:value="editModal.no" disabled @keydown.enter.prevent />
+            <NInput v-model:value="editModal.no" disabled @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="name" label="姓名">
-            <n-input v-model:value="editModal.name" @keydown.enter.prevent />
+            <NInput v-model:value="editModal.name" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="username" label="昵称">
-            <n-input v-model:value="editModal.username" @keydown.enter.prevent />
+            <NInput v-model:value="editModal.username" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="roleId" label="部门">
             <n-select
@@ -240,13 +280,13 @@ onMounted(() => {
             />
           </n-form-item>
           <n-form-item path="email" label="邮箱">
-            <n-input v-model:value="editModal.email" @keydown.enter.prevent />
+            <NInput v-model:value="editModal.email" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="phone" label="手机">
-            <n-input v-model:value="editModal.phone" @keydown.enter.prevent />
+            <NInput v-model:value="editModal.phone" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="seat" label="座位">
-            <n-input v-model:value="editModal.seat" @keydown.enter.prevent />
+            <NInput v-model:value="editModal.seat" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="status" label="状态">
             <n-select
