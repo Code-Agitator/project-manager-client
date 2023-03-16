@@ -7,6 +7,7 @@ interface UserInfo {
   name?: string
   avatar?: string
   role?: Array<string>
+  departmentId?: string
 }
 
 export const useUserStore = defineStore('user', {
@@ -25,9 +26,13 @@ export const useUserStore = defineStore('user', {
     avatar(): string {
       return this.userInfo.avatar || ''
     },
+    departmentId(): string {
+      return this.userInfo.departmentId || ''
+    },
     role(): Array<string> {
       return this.userInfo.role || []
     },
+
   },
   actions: {
     async getUserInfo() {

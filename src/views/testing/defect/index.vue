@@ -187,17 +187,6 @@ const columns: DataTableColumns<RowData> = [
           },
           { default: () => '修改' },
         ),
-        h(
-          NButton,
-          {
-            strong: true,
-            tertiary: true,
-            size: 'small',
-            style: { marginLeft: '10px' },
-            onClick: () => handleDeleteDefect(row.id),
-          },
-          { default: () => '删除' },
-        ),
       ]
     },
   },

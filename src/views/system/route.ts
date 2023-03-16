@@ -10,7 +10,6 @@ export default {
     title: '系统管理',
     customIcon: 'logo',
     role: ['admin'],
-    requireAuth: true,
     order: 1,
   },
   children: [
@@ -21,7 +20,6 @@ export default {
       meta: {
         title: '用户管理',
         icon: 'logos:unocss',
-        role: ['admin'],
         requireAuth: false,
       },
     }, {

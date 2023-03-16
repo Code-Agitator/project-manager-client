@@ -12,14 +12,39 @@ const dialog = useDialog()
 const tableData = ref<RowData[]>([])
 const showEditModal = ref<boolean>(false)
 const editModal = ref<RoleSaveData>({})
-const editModalTitle = '我除了叫编辑我还能叫什么'
 const loading = ref<boolean>(false)
 const editModalMode = ref<number>(1)
+const transferValue = ref<string[]>([])
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
 })
 const queryForm = ref<RoleSearchParam>({})
-
+const menuOptions = [
+  {
+    label: '用户管理',
+    value: 'User',
+  },
+  {
+    label: '部门管理',
+    value: 'Department',
+  },
+  {
+    label: '角色管理',
+    value: 'Role',
+  },
+  {
+    label: '测试计划管理',
+    value: 'Plan',
+  },
+  {
+    label: '缺陷管理',
+    value: 'Defect',
+  },
+  {
+    label: '测试用例管理',
+    value: 'Case',
+  },
+]
 const initTableData = () => {
   loading.value = true
   queryForm.value.pageSize = pagination.pageSize
@@ -65,6 +90,7 @@ const columns: DataTableColumns<RowData> = [
               editModalMode.value = 2
               editModal.value = row
               showEditModal.value = true
+              transferValue.value = JSON.parse(row.menu ?? '[]')
             },
           },
           { default: () => '修改' },
@@ -87,6 +113,7 @@ const columns: DataTableColumns<RowData> = [
 
 const handelSaveBtnClick = async () => {
   try {
+    editModal.value.menu = JSON.stringify(transferValue.value)
     if (editModalMode.value === 1)
       await api.saveRole(editModal.value)
     else
@@ -97,6 +124,10 @@ const handelSaveBtnClick = async () => {
   }
   catch (e) {
     window.$message?.error('修改失败')
+  }
+  finally {
+    editModal.value.menu = ''
+    transferValue.value = []
   }
 }
 
@@ -135,6 +166,7 @@ onMounted(() => {
             editModalMode = 1
             editModal = {}
             showEditModal = true
+            transferValue = []
           }"
         >
           + 新增
@@ -164,6 +196,11 @@ onMounted(() => {
           </n-form-item>
           <n-form-item path="name" label="角色名称">
             <n-input v-model:value="editModal.roleName" @keydown.enter.prevent />
+          </n-form-item>
+          <n-form-item path="menu" label="菜单">
+            <n-transfer
+              ref="transfer" v-model:value="transferValue" :options="menuOptions"
+            />
           </n-form-item>
           <n-row :gutter="[0, 24]">
             <n-col :span="24">

@@ -10,6 +10,7 @@ import type { User, UserVo } from '@/views/system/user/type/response'
 import type { UserSearchParam } from '@/views/system/user/type/request'
 import type { RoleSaveData } from '@/views/system/role/type/request'
 import type { DepartmentVo } from '@/views/system/department/type/response'
+import { useUserStore } from '@/store'
 
 const editModalMode = ref<number>(1)
 const tableData = ref<RowData[]>([])
@@ -59,6 +60,7 @@ const handleDeleteUser = async (id?: number) => {
   }
 }
 const dialog = useDialog()
+const userInfo = useUserStore()
 const columns: DataTableColumns<RowData> = [
   { title: '用户编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
   { title: '用户名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
@@ -80,6 +82,10 @@ const columns: DataTableColumns<RowData> = [
     key: 'actions',
     width: 200,
     render(row) {
+      const role = userInfo.role[0]
+      const isAdmin = role === 'admin' || role === 'major'
+      const isSelf = row.id === (userInfo.userId as unknown as number)
+
       return [
         h(
           NButton,
@@ -88,6 +94,7 @@ const columns: DataTableColumns<RowData> = [
             tertiary: true,
             size: 'small',
             type: 'error',
+            disabled: !isAdmin && !isSelf,
             onClick: () => {
               const pwd = ref('')
               dialog.warning({
@@ -123,6 +130,7 @@ const columns: DataTableColumns<RowData> = [
             strong: true,
             tertiary: true,
             size: 'small',
+            disabled: !isAdmin,
             style: { marginLeft: '10px' },
             onClick: () => {
               editModalMode.value = 2
@@ -138,6 +146,7 @@ const columns: DataTableColumns<RowData> = [
             strong: true,
             tertiary: true,
             size: 'small',
+            disabled: !isAdmin,
             style: { marginLeft: '10px' },
             onClick: () => handleDeleteUser(row.id),
           },
@@ -171,6 +180,9 @@ const getDepartmentList = async () => {
 getDepartmentList()
 
 onMounted(() => {
+  const role = userInfo.role[0]
+  if (role === 'major')
+    queryForm.value.departmentId = userInfo.departmentId as unknown as number
   initTableData()
   pagination.onUpdatePage = (page) => {
     pagination.page = page
@@ -275,7 +287,7 @@ onMounted(() => {
           <n-form-item path="roleId" label="角色">
             <n-select
               v-model:value="editModal.roleId" :options="[
-                { label: '主管', value: 1 }, { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 },
+                { label: '超级管理', value: 1 }, { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 }, { label: '主管', value: 4 },
               ]"
             />
           </n-form-item>

@@ -6,6 +6,7 @@ export interface RoleSearchParam extends RoleSaveData, BasePageParam {
 export interface RoleSaveData {
   roleCode?: string
   roleName?: string
+  menu?: string
 }
 
 export interface RoleDeleteParam extends RoleSaveData {

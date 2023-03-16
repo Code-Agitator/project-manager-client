@@ -14,4 +14,6 @@ export interface Role {
    * 角色名称
    */
   roleName?: string
+
+  menu?: string
 }

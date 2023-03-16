@@ -5,6 +5,9 @@ function hasPermission(route: RouteType, role: string[]) {
   if (!route.meta?.requireAuth)
     return true
 
+  if (role[0] === 'admin')
+    return true
+
   const routeRole = route.meta?.role ? route.meta.role : []
 
   // * 登录用户没有角色或者路由没有设置角色判定为没有权限
