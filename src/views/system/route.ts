@@ -22,7 +22,7 @@ export default {
         title: '用户管理',
         icon: 'logos:unocss',
         role: ['admin'],
-        requireAuth: true,
+        requireAuth: false,
       },
     }, {
       name: 'Department',

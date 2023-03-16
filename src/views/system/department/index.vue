@@ -153,6 +153,7 @@ onMounted(() => {
           @click="() => {
             editModal = 1
             toShowEditModel()
+            selectedUserName = ''
           }"
         >
           + 新增

@@ -31,7 +31,7 @@ export default {
       meta: {
         title: '缺陷管理',
         icon: 'logos:unocss',
-        role: ['admin'],
+        role: ['admin', 'test', 'dev'],
         requireAuth: true,
       },
     },
