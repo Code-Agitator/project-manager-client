@@ -42,6 +42,7 @@ function getMenuItem(route: RouteType, basePath = ''): MennuItem {
     path: resolvePath(basePath, route.path),
     icon: getIcon(route.meta),
     order: route.meta?.order || 0,
+
   }
 
   const visibleChildren = route.children ? route.children.filter((item: RouteType) => item.name && !item.isHidden) : []

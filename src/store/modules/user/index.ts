@@ -8,6 +8,7 @@ interface UserInfo {
   avatar?: string
   role?: Array<string>
   departmentId?: string
+  menu?: Array<string>
 }
 
 export const useUserStore = defineStore('user', {
@@ -32,6 +33,9 @@ export const useUserStore = defineStore('user', {
     role(): Array<string> {
       return this.userInfo.role || []
     },
+    menu(): Array<string> {
+      return this.userInfo.menu || []
+    },
 
   },
   actions: {
@@ -43,8 +47,9 @@ export const useUserStore = defineStore('user', {
         // if (res.code === 200) {
         if (res) {
           // res.data && (this.userInfo = { id:res.data?.userId, name:res.data?.username, avatar:res.data?.avgPath, role:['admin'] })
-          this.userInfo = res
+          res.role.menu && (this.userInfo.menu = JSON.parse(res.role.menu))
           this.userInfo.role = [res?.role?.roleCode]
+          this.userInfo.name = res.name
           return Promise.resolve(res)
         }
         else {

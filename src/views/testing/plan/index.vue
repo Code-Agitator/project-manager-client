@@ -8,6 +8,7 @@ import userApi from '@/views/system/user/api'
 import type { TestingPlanVo } from '@/views/testing/plan/type/response'
 import type { TestingPlanSearchDto } from '@/views/testing/plan/type/request'
 import type { UserVo } from '@/views/system/user/type/response'
+import { useUserStore } from '@/store'
 
 const editModalMode = ref<number>(1)
 const tableData = ref<RowData[]>([])
@@ -16,6 +17,7 @@ const editModal = ref<TestingPlanVo>({})
 const loading = ref<boolean>(false)
 const selectedUserName = ref<string>('')
 const searchUserResult = ref<UserVo[]>([])
+const userInfo = useUserStore()
 const autoCompleteOptions = computed(() => searchUserResult.value?.map((user) => {
   return {
     label: user.username,
@@ -200,6 +202,7 @@ onMounted(() => {
           </n-form-item-gi>
         </n-grid>
         <NButton
+          :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')"
           ml="10" type="primary"
           @click="() => {
             editModalMode = 1

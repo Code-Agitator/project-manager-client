@@ -14,12 +14,12 @@ export const usePermissionStore = defineStore('permission', {
       return basicRoutes.concat(this.accessRoutes)
     },
     menus(): RoutesType {
-      return this.routes.filter(route => route.name && !route.isHidden)
+      return this.routes.filter(route => route.name && !route.isHidden && route.children?.length)
     },
   },
   actions: {
-    generateRoutes(role: Array<string> = []): RoutesType {
-      const accessRoutes = filterAsyncRoutes(asyncRoutes, role)
+    generateRoutes(role: Array<string> = [], menu: Array<string> = []): RoutesType {
+      const accessRoutes = filterAsyncRoutes(asyncRoutes, role, menu)
       this.accessRoutes = accessRoutes
       return accessRoutes
     },

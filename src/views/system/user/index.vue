@@ -240,6 +240,7 @@ onMounted(() => {
           </n-form-item-gi>
         </n-grid>
         <NButton
+          :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')"
           ml="10" type="primary"
           @click="() => {
             editModalMode = 1

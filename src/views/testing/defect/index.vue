@@ -7,6 +7,7 @@ import departmentApi from '@/views/system/department/api'
 import type { DefectVo } from '@/views/testing/defect/type/response'
 import type { DepartmentVo } from '@/views/system/department/type/response'
 import type { DefectSearchParam } from '@/views/testing/defect/type/request'
+import { useUserStore } from '@/store'
 
 const editModalMode = ref<number>(1)
 const tableData = ref<RowData[]>([])
@@ -16,6 +17,8 @@ const loading = ref<boolean>(false)
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
 })
+const userInfo = useUserStore()
+const isDev = userInfo.role[0] === 'dev'
 
 interface RowData extends DefectVo {
 }
@@ -216,6 +219,9 @@ getDepartmentList()
 
 onMounted(() => {
   initTableData()
+  if (isDev)
+    queryForm.value.userId = userInfo.userId as unknown as number
+
   pagination.onUpdatePage = (page) => {
     pagination.page = page
     initTableData()
@@ -291,6 +297,7 @@ onMounted(() => {
           </n-form-item-gi>
         </n-grid>
         <NButton
+          :disabled="isDev"
           ml="10" type="primary"
           @click="() => {
             editModalMode = 1
@@ -321,14 +328,15 @@ onMounted(() => {
       >
         <n-form ref="formRef" :model="editModal">
           <n-form-item path="title" label="缺陷标题">
-            <n-input v-model:value="editModal.title" @keydown.enter.prevent />
+            <n-input v-model:value="editModal.title" :disabled="isDev" @keydown.enter.prevent />
           </n-form-item>
-          <n-form-item path="comment" label="缺陷描述">
+          <n-form-item path="comment" label="备注">
             <n-input v-model:value="editModal.comment" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="level" label="严重程度">
             <n-select
               v-model:value="editModal.level"
+              :disabled="isDev"
               :options="Object.entries(formatLevel).map(level => ({
                 label: level[1].label,
                 value: level[0],
@@ -339,6 +347,7 @@ onMounted(() => {
           <n-form-item path="status" label="状态">
             <n-select
               v-model:value="editModal.status"
+
               :options="Object.entries(formatStatus).map(level => ({
                 label: level[1].label,
                 value: level[0],
@@ -349,6 +358,7 @@ onMounted(() => {
           <n-form-item path="type" label="类型">
             <n-select
               v-model:value="editModal.type"
+              :disabled="isDev"
               :options="Object.entries(formatType).map(level => ({
                 label: level[1].label,
                 value: level[0],
@@ -359,6 +369,7 @@ onMounted(() => {
           <n-form-item path="priority" label="优先级">
             <n-select
               v-model:value="editModal.priority"
+              :disabled="isDev"
               :options="Object.entries(formatPriority).map(level => ({
                 label: level[1].label,
                 value: level[0],
@@ -369,6 +380,7 @@ onMounted(() => {
           <n-form-item path="repeatedProbability" label="重复概率">
             <n-select
               v-model:value="editModal.repeatedProbability"
+              :disabled="isDev"
               :options="Object.entries(formatRepeatedProbability).map(level => ({
                 label: level[1].label,
                 value: level[0],

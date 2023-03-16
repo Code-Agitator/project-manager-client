@@ -10,7 +10,6 @@ export default {
     title: '测试管理',
     customIcon: 'logo',
     role: ['admin'],
-    requireAuth: true,
     order: 1,
   },
   children: [

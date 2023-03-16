@@ -20,7 +20,7 @@ export default {
       meta: {
         title: '用户管理',
         icon: 'logos:unocss',
-        requireAuth: false,
+        requireAuth: true,
       },
     }, {
       name: 'Department',
