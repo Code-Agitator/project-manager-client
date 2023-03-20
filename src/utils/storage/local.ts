@@ -11,11 +11,11 @@ const DEFAULT_CACHE_TIME = 60 * 60 * 24 * 7
 export function setLocal(key: string, value: unknown, expire: number | null = DEFAULT_CACHE_TIME) {
   const storageData: StorageData = { value, expire: expire !== null ? new Date().getTime() + expire * 1000 : null }
   const json = encrypto(storageData)
-  window.localStorage.setItem(key, json)
+  window.sessionStorage.setItem(key, json)
 }
 
 export function getLocal<T>(key: string) {
-  const json = window.localStorage.getItem(key)
+  const json = window.sessionStorage.getItem(key)
   if (json) {
     let storageData: StorageData | null = null
     try {
@@ -35,7 +35,7 @@ export function getLocal<T>(key: string) {
 }
 
 export function getLocalExpire(key: string): number | null {
-  const json = window.localStorage.getItem(key)
+  const json = window.sessionStorage.getItem(key)
   if (json) {
     let storageData: StorageData | null = null
     try {
@@ -52,9 +52,9 @@ export function getLocalExpire(key: string): number | null {
 }
 
 export function removeLocal(key: string) {
-  window.localStorage.removeItem(key)
+  window.sessionStorage.removeItem(key)
 }
 
 export function clearLocal() {
-  window.localStorage.clear()
+  window.sessionStorage.clear()
 }

@@ -5,7 +5,7 @@ const WHITE_LIST = ['/login']
 export function createPermissionGuard(router: Router) {
   router.beforeEach(async (to) => {
     // const token = getToken()
-    const userInfo = localStorage.getItem('userInfo')
+    const userInfo = sessionStorage.getItem('userInfo')
     /** 没有token的情况 */
     // if (isNullOrWhitespace(token)) {
     if (!userInfo) {

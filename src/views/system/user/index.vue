@@ -138,13 +138,22 @@ const columns: DataTableColumns<RowData> = [
                 title: '修改密码',
                 positiveText: '确定',
                 onPositiveClick: async () => {
-                  pwd.value && await api.updateUser({
-                    id: row.id,
-                    password: md5(pwd.value),
-                  }).then(() => {
-                    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
-                  }).catch(() => {
-                    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+                  return new Promise<void>((resolve, reject) => {
+                    if (pwd.value.length < 6) {
+                      window.$message?.warning('密码必须大于6位')
+                      // eslint-disable-next-line prefer-promise-reject-errors
+                      return reject()
+                    }
+                    api.updateUser({
+                      id: row.id,
+                      password: md5(pwd.value),
+                    }).then(() => {
+                      window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
+                    }).catch(() => {
+                      window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+                    }).finally(() => {
+                      resolve()
+                    })
                   })
                 },
                 content: () => h(
