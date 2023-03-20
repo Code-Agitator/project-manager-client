@@ -108,19 +108,20 @@ const handelSaveBtnClick = async () => {
   }
   catch (e) {
     window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-
   }
 }
 const columns: DataTableColumns<RowData> = [
-  { title: '用例编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
-  { title: '用例标题', key: 'name', width: 150, ellipsis: { tooltip: true } },
-  { title: '用例备注', key: 'comment', width: 150, ellipsis: { tooltip: true } },
-  { title: '测试计划', key: 'plantId', width: 150, ellipsis: { tooltip: true }, render: row => row.testingPlan?.name },
-  { title: '输出者', key: 'userId', width: 150, ellipsis: { tooltip: true }, render: row => row.user?.name },
+  { title: '用例编号', key: 'id', width: 120, ellipsis: { tooltip: true } },
+  { title: '测试计划', key: 'plantId', ellipsis: { tooltip: true }, render: row => row.testingPlan?.name },
+  { title: '用例标题', key: 'name', ellipsis: { tooltip: true } },
+  { title: '输出者', key: 'userId', ellipsis: { tooltip: true }, render: row => row.user?.name },
+  { title: '用例链接', key: 'link', ellipsis: { tooltip: true } },
+  { title: '测试结果', key: 'result', ellipsis: { tooltip: true } },
+  { title: '用例备注', key: 'comment', ellipsis: { tooltip: true } },
   {
     title: '操作',
     key: 'actions',
-    width: 100,
+    width: 150,
     render(row) {
       return [
         h(
@@ -186,13 +187,21 @@ onMounted(() => {
                 <n-input
                   :value="slotValue"
                   placeholder="输出者"
+                  @focus="() => {
+                    userApi.searchUser({ name: '' }).then((res) => {
+                      searchUserResultInQuery = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResultInQuery = []
+                    })
+                    handleInput(' ')
+                  }"
                   @input="(name) => {
                     userApi.searchUser({ name }).then((res) => {
                       searchUserResultInQuery = res.data.records ?? []
                     }).catch(e => {
                       searchUserResultInQuery = []
                     })
-                    handleInput(name)
+                    handleInput(name.trimStart())
                   }"
                 />
               </template>
@@ -210,14 +219,21 @@ onMounted(() => {
                 <n-input
                   :value="slotValue"
                   placeholder="测试计划"
-
+                  @focus="() => {
+                    planApi.searchPlan({ name: '' }).then((res) => {
+                      searchPlanResultInQuery = res.data.records ?? []
+                    }).catch(e => {
+                      searchPlanResultInQuery = []
+                    })
+                    handleInput(' ')
+                  }"
                   @input="(name) => {
                     planApi.searchPlan({ name }).then((res) => {
                       searchPlanResultInQuery = res.data.records ?? []
                     }).catch(e => {
                       searchPlanResultInQuery = []
                     })
-                    handleInput(name)
+                    handleInput(name.trimStart())
                   }"
                 />
               </template>
@@ -252,7 +268,6 @@ onMounted(() => {
       :row-key="(row:RowData) => row.id"
       :data="tableData"
       :pagination="pagination"
-      :scroll-x="1600"
       :loading="loading"
     />
 
@@ -270,6 +285,9 @@ onMounted(() => {
           </n-form-item>
           <n-form-item path="title" label="用例链接">
             <n-input v-model:value="editModal.link" @keydown.enter.prevent />
+          </n-form-item>
+          <n-form-item path="title" label="测试结果">
+            <n-input v-model:value="editModal.result" @keydown.enter.prevent />
           </n-form-item>
 
           <n-form-item path="userId" label="输出者">

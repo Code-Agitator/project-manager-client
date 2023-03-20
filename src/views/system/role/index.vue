@@ -161,17 +161,6 @@ onMounted(() => {
             </NButton>
           </n-form-item-gi>
         </n-grid>
-        <NButton
-          ml="10" type="primary"
-          @click="() => {
-            editModalMode = 1
-            editModal = {}
-            showEditModal = true
-            transferValue = []
-          }"
-        >
-          + 新增
-        </NButton>
       </n-form>
     </div>
 
@@ -182,7 +171,6 @@ onMounted(() => {
       :row-key="(row:RowData) => row.id"
       :data="tableData"
       :pagination="pagination"
-      :scroll-x="1600"
       :loading="loading"
     />
 
