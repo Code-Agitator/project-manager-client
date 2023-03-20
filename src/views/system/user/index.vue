@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { DataTableColumns } from 'naive-ui'
+import type { DataTableColumns, FormInst, FormItemRule } from 'naive-ui'
 import { NButton, NInput, NSwitch, useDialog } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
 import md5 from 'md5'
+import type { FormRules } from 'naive-ui/es/form/src/interface'
 import { renderIcon, timeFormat } from '@/utils/common'
 import api from '@/views/system/user/api'
 import departmentApi from '@/views/system/department/api'
@@ -22,6 +23,37 @@ const editModalWidth = '600px'
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
 })
+
+const formRef = ref<FormInst | null>(null)
+const rules: FormRules = {
+  no: { required: true, trigger: ['input', 'blur'] },
+  name: { required: true, trigger: ['input', 'blur'] },
+  departmentId: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value !== undefined,
+  },
+  roleId: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value !== undefined,
+  },
+  email: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value: string) => /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value),
+  },
+  phone: {
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value: string) => /^[1]+[3,8]+\\d{9}$/.test(value),
+  },
+  seat: { required: true, trigger: ['input', 'blur'] },
+  status: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value !== undefined,
+  },
+}
 
 interface RowData extends UserVo {
   isPublish?: boolean
@@ -66,7 +98,13 @@ const columns: DataTableColumns<RowData> = [
   { title: '用户名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
   { title: '部门', key: 'departmentId', width: 150, render: row => row.department?.name },
   { title: '手机号码', key: 'phone', width: 150, ellipsis: { tooltip: true } },
-  { title: '状态', key: 'status', width: 150, ellipsis: { tooltip: true }, render: row => row.status && status[row.status] },
+  {
+    title: '状态',
+    key: 'status',
+    width: 150,
+    ellipsis: { tooltip: true },
+    render: row => row.status && status[row.status],
+  },
   {
     title: '创建时间',
     key: 'createdTime',
@@ -157,18 +195,22 @@ const columns: DataTableColumns<RowData> = [
 ]
 
 const handelSaveBtnClick = async () => {
-  try {
-    if (editModalMode.value === 1)
-      await api.saveUser(editModal.value)
-    else
-      await api.updateUser(editModal.value)
-    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
-    showEditModal.value = false
-    initTableData()
-  }
-  catch (e) {
-    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-  }
+  formRef.value?.validate(async (errors) => {
+    if (!errors) {
+      try {
+        if (editModalMode.value === 1)
+          await api.saveUser(editModal.value)
+        else
+          await api.updateUser(editModal.value)
+        window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
+        showEditModal.value = false
+        initTableData()
+      }
+      catch (e) {
+        window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+      }
+    }
+  })
 }
 
 const departmentList = ref<DepartmentVo[]>([])
@@ -285,14 +327,14 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="editModal">
+        <n-form ref="formRef" :model="editModal" :rules="rules">
           <n-form-item v-if="editModalMode !== 1" path="no" label="工号">
             <NInput v-model:value="editModal.no" :disabled="userInfo.role[0] !== 'admin'" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="name" label="姓名">
             <NInput v-model:value="editModal.name" :disabled="userInfo.role[0] !== 'admin'" @keydown.enter.prevent />
           </n-form-item>
-          <n-form-item path="roleId" label="部门">
+          <n-form-item path="departmentId" label="部门">
             <n-select
               v-model:value="editModal.departmentId"
               :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')"
@@ -314,7 +356,11 @@ onMounted(() => {
             <NInput v-model:value="editModal.phone" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="seat" label="座位">
-            <NInput v-model:value="editModal.seat" :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')" @keydown.enter.prevent />
+            <NInput
+              v-model:value="editModal.seat"
+              :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')"
+              @keydown.enter.prevent
+            />
           </n-form-item>
           <n-form-item path="status" label="状态">
             <n-select
