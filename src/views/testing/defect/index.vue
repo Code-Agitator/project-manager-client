@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { DataTableColumns } from 'naive-ui'
+import type { DataTableColumns, FormInst, FormItemRule } from 'naive-ui'
 import { NButton, NTag } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
+import type { FormRules } from 'naive-ui/es/form/src/interface'
 import defectApi from '@/views/testing/defect/api'
 import departmentApi from '@/views/system/department/api'
 import type { DefectVo } from '@/views/testing/defect/type/response'
@@ -72,6 +73,36 @@ const formatRepeatedProbability: {
   none: { type: 'success', label: '无' },
 }
 
+const formRef = ref<FormInst | null>(null)
+const rules: FormRules = {
+  title: { required: true, trigger: ['input', 'blur'] },
+  type: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+  },
+  priority: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+  },
+  level: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+  },
+  repeatedProbability: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+  },
+  status: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+  },
+}
+
 const queryForm = ref<DefectSearchParam>({})
 
 const initTableData = () => {
@@ -100,9 +131,8 @@ const handleDeleteDefect = async (id?: number) => {
 const columns: DataTableColumns<RowData> = [
   { title: '缺陷编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
   { title: '缺陷标题', key: 'title', width: 150, ellipsis: { tooltip: true } },
-  { title: '缺陷描述', key: 'comment', width: 150, ellipsis: { tooltip: true } },
   {
-    title: '类型',
+    title: '缺陷类型',
     key: 'type',
     width: 150,
     ellipsis: { tooltip: true },
@@ -110,17 +140,6 @@ const columns: DataTableColumns<RowData> = [
       NTag,
       { bordered: false, type: formatType[row.type ?? ''].type },
       { default: () => formatType[row.type ?? ''].label },
-    ),
-  },
-  {
-    title: '严重程度',
-    key: 'level',
-    width: 150,
-    ellipsis: { tooltip: true },
-    render: row => h(
-      NTag,
-      { bordered: false, type: formatLevel[row.level ?? ''].type },
-      { default: () => formatLevel[row.level ?? ''].label },
     ),
   },
   {
@@ -135,6 +154,17 @@ const columns: DataTableColumns<RowData> = [
     ),
   },
   {
+    title: '严重程度',
+    key: 'level',
+    width: 150,
+    ellipsis: { tooltip: true },
+    render: row => h(
+      NTag,
+      { bordered: false, type: formatLevel[row.level ?? ''].type },
+      { default: () => formatLevel[row.level ?? ''].label },
+    ),
+  },
+  {
     title: '重复概率',
     key: 'repeatedProbability',
     width: 150,
@@ -143,17 +173,6 @@ const columns: DataTableColumns<RowData> = [
       NTag,
       { bordered: false, type: formatRepeatedProbability[row.repeatedProbability ?? ''].type },
       { default: () => formatRepeatedProbability[row.repeatedProbability ?? ''].label },
-    ),
-  },
-  {
-    title: '状态',
-    key: 'status',
-    width: 150,
-    ellipsis: { tooltip: true },
-    render: row => h(
-      NTag,
-      { bordered: false, type: formatStatus[row.status as number].type },
-      { default: () => formatStatus[row.status as number].label },
     ),
   },
   {
@@ -169,6 +188,18 @@ const columns: DataTableColumns<RowData> = [
     width: 150,
     ellipsis: { tooltip: true },
     render: row => row.user?.username ?? '-',
+  },
+  { title: '缺陷描述', key: 'comment', width: 150, ellipsis: { tooltip: true } },
+  {
+    title: '状态',
+    key: 'status',
+    width: 150,
+    ellipsis: { tooltip: true },
+    render: row => h(
+      NTag,
+      { bordered: false, type: formatStatus[row.status as number].type },
+      { default: () => formatStatus[row.status as number].label },
+    ),
   },
   {
     title: '操作',
@@ -196,18 +227,22 @@ const columns: DataTableColumns<RowData> = [
 ]
 
 const handelSaveBtnClick = async () => {
-  try {
-    if (editModalMode.value === 1)
-      await defectApi.saveDefect(editModal.value)
-    else
-      await defectApi.updateDefect(editModal.value)
-    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
-    showEditModal.value = false
-    initTableData()
-  }
-  catch (e) {
-    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-  }
+  formRef.value?.validate(async (errors) => {
+    if (!errors) {
+      try {
+        if (editModalMode.value === 1)
+          await defectApi.saveDefect(editModal.value)
+        else
+          await defectApi.updateDefect(editModal.value)
+        window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
+        showEditModal.value = false
+        initTableData()
+      }
+      catch (e) {
+        window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+      }
+    }
+  })
 }
 
 const departmentList = ref<DepartmentVo[]>([])
@@ -324,34 +359,9 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="editModal">
+        <n-form ref="formRef" :model="editModal" :rules="rules" :validate-messages="{ required: '该项不能为空' }">
           <n-form-item path="title" label="缺陷标题">
             <n-input v-model:value="editModal.title" :disabled="isDev" @keydown.enter.prevent />
-          </n-form-item>
-          <n-form-item path="comment" label="备注">
-            <n-input v-model:value="editModal.comment" :disabled="isDev" @keydown.enter.prevent />
-          </n-form-item>
-          <n-form-item path="level" label="严重程度">
-            <n-select
-              v-model:value="editModal.level"
-              :disabled="isDev"
-              :options="Object.entries(formatLevel).map(level => ({
-                label: level[1].label,
-                value: level[0],
-              }))"
-              placeholder="请选择严重程度"
-            />
-          </n-form-item>
-          <n-form-item path="status" label="状态">
-            <n-select
-              v-model:value="editModal.status"
-
-              :options="Object.entries(formatStatus).map(level => ({
-                label: level[1].label,
-                value: level[0],
-              }))"
-              placeholder="请选择状态"
-            />
           </n-form-item>
           <n-form-item path="type" label="类型">
             <n-select
@@ -375,6 +385,17 @@ onMounted(() => {
               placeholder="请选择优先级"
             />
           </n-form-item>
+          <n-form-item path="level" label="严重程度">
+            <n-select
+              v-model:value="editModal.level"
+              :disabled="isDev"
+              :options="Object.entries(formatLevel).map(level => ({
+                label: level[1].label,
+                value: level[0],
+              }))"
+              placeholder="请选择严重程度"
+            />
+          </n-form-item>
           <n-form-item path="repeatedProbability" label="重复概率">
             <n-select
               v-model:value="editModal.repeatedProbability"
@@ -384,6 +405,20 @@ onMounted(() => {
                 value: level[0],
               }))"
               placeholder="请选择重复概率"
+            />
+          </n-form-item>
+          <n-form-item path="comment" label="备注">
+            <n-input v-model:value="editModal.comment" :disabled="isDev" @keydown.enter.prevent />
+          </n-form-item>
+          <n-form-item path="status" label="状态">
+            <n-select
+              v-model:value="editModal.status"
+
+              :options="Object.entries(formatStatus).map(level => ({
+                label: level[1].label,
+                value: level[0],
+              }))"
+              placeholder="请选择状态"
             />
           </n-form-item>
           <n-row :gutter="[0, 24]">

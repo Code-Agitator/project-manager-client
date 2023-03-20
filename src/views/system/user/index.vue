@@ -31,27 +31,27 @@ const rules: FormRules = {
   departmentId: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value !== undefined,
+    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
   },
   roleId: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value !== undefined,
+    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
   },
   email: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value: string) => /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value),
+    validator: (rule: FormItemRule, value: string) => !/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value) && Promise.reject(Error('邮箱格式有误')),
   },
   phone: {
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value: string) => /^[1]+[3,8]+\\d{9}$/.test(value),
+    validator: (rule: FormItemRule, value: string) => !/^[1]+[3,8]+\\d{9}$/.test(value) && Promise.reject(Error('手机号格式有误')),
   },
   seat: { required: true, trigger: ['input', 'blur'] },
   status: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value !== undefined,
+    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
   },
 }
 
@@ -335,7 +335,7 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="editModal" :rules="rules">
+        <n-form ref="formRef" :model="editModal" :rules="rules" :validate-messages="{ required: '该项不能为空' }">
           <n-form-item v-if="editModalMode !== 1" path="no" label="工号">
             <NInput v-model:value="editModal.no" :disabled="userInfo.role[0] !== 'admin'" @keydown.enter.prevent />
           </n-form-item>
