@@ -42,7 +42,7 @@ export const useUserStore = defineStore('user', {
     async getUserInfo() {
       try {
         // const res = await api.getUser()
-        const userInfo = localStorage.getItem('userInfo')
+        const userInfo = sessionStorage.getItem('userInfo')
         const res = userInfo ? JSON.parse(userInfo) : null
         // if (res.code === 200) {
         if (res) {
@@ -62,7 +62,7 @@ export const useUserStore = defineStore('user', {
     },
     async logout() {
       removeToken()
-      localStorage.removeItem('userInfo')
+      sessionStorage.removeItem('userInfo')
       this.userInfo = {}
       toLogin()
     },

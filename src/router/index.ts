@@ -23,7 +23,7 @@ export async function resetRouter() {
 
 export async function addDynamicRoutes() {
   // const token = getToken()
-  const userInfo = localStorage.getItem('userInfo')
+  const userInfo = sessionStorage.getItem('userInfo')
 
   // 没有token情况
   // if (isNullOrWhitespace(token)) {

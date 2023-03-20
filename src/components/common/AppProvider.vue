@@ -34,7 +34,7 @@ watch(
     for (const key in common) {
       useCssVar(`--${kebabCase(key)}`, document.documentElement).value = common[key as ThemeVarsKeys] || ''
       if (key === 'primaryColor')
-        window.localStorage.setItem('__THEME_COLOR__', common[key as ThemeVarsKeys] || '')
+        window.sessionStorage.setItem('__THEME_COLOR__', common[key as ThemeVarsKeys] || '')
     }
   },
   { immediate: true },

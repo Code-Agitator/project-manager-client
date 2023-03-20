@@ -45,7 +45,7 @@ async function handleLogin() {
       window.$notification?.success({ title: '登录成功！', duration: 2500 })
       // res.data && setToken(res.data.accessToken)
       // setLocal('userInfo', res.data)
-      localStorage.setItem('userInfo', JSON.stringify(res.data))
+      sessionStorage.setItem('userInfo', JSON.stringify(res.data))
       if (isRemember.value)
         setLocal('loginInfo', { name, password })
       else
