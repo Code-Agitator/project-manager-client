@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import type { DataTableColumns, FormInst, FormItemRule } from 'naive-ui'
-import { NButton, NInput, NSwitch, useDialog } from 'naive-ui'
+import { NButton, NInput, useDialog } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
 import md5 from 'md5'
 import type { FormRules } from 'naive-ui/es/form/src/interface'
-import { renderIcon, timeFormat } from '@/utils/common'
+import { saveAs } from 'file-saver'
+import { timeFormat } from '@/utils/common'
 import api from '@/views/system/user/api'
 import departmentApi from '@/views/system/department/api'
-import type { User, UserVo } from '@/views/system/user/type/response'
+import type { UserVo } from '@/views/system/user/type/response'
 import type { UserSearchParam } from '@/views/system/user/type/request'
-import type { RoleSaveData } from '@/views/system/role/type/request'
 import type { DepartmentVo } from '@/views/system/department/type/response'
 import { useUserStore } from '@/store'
+import { httpNa } from '@/utils/http'
 
 const editModalMode = ref<number>(1)
 const tableData = ref<RowData[]>([])
@@ -219,6 +220,13 @@ const getDepartmentList = async () => {
   departmentList.value = data?.records ?? []
 }
 getDepartmentList()
+const exportData = () => {
+  httpNa.post('/user/export', queryForm).catch((err) => {
+    const blob = new Blob([err.data], { type: 'application/vnd.ms-excel' })
+    const cd = err.headers['content-disposition']
+    saveAs(blob, cd.substring(cd.indexOf('filename=') + 9))
+  })
+}
 
 onMounted(() => {
   const role = userInfo.role[0]
@@ -300,12 +308,14 @@ onMounted(() => {
         >
           <n-upload-trigger #="{ handleClick }" abstract>
             <NButton type="primary" @click="handleClick">
-              上传
+              批量导入
             </NButton>
             <n-upload-file-list hidden />
           </n-upload-trigger>
         </n-upload>
-        <NButton ml="10" type="primary" @click="initTableData">
+        <NButton
+          ml="10" type="primary" @click="exportData()"
+        >
           导出
         </NButton>
       </n-form>
