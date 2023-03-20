@@ -118,12 +118,13 @@ const handelSaveBtnClick = async () => {
       await api.saveRole(editModal.value)
     else
       await api.updateRole(editModal.value)
-    window.$message?.success('修改成功')
+    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
     showEditModal.value = false
     initTableData()
   }
   catch (e) {
-    window.$message?.error('修改失败')
+    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+
   }
   finally {
     editModal.value.menu = ''

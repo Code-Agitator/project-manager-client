@@ -25,7 +25,7 @@ const selectedUserName = ref<string>('')
 const searchUserResult = ref<UserVo[]>([])
 const autoCompleteUserOptions = computed(() => searchUserResult.value?.map((user) => {
   return {
-    label: user.username,
+    label: user.name,
     value: user.id,
   }
 }) ?? [])
@@ -61,7 +61,7 @@ const selectedUserNameInQuery = ref<string>('')
 const searchUserResultInQuery = ref<UserVo[]>([])
 const autoCompleteOptionsInQuery = computed(() => searchUserResultInQuery.value?.map((user) => {
   return {
-    label: user.username,
+    label: user.name,
     value: user.id,
   }
 }) ?? [])
@@ -102,12 +102,13 @@ const handelSaveBtnClick = async () => {
       await api.saveCase(editModal.value)
     else
       await api.updateCase(editModal.value)
-    window.$message?.success('修改成功')
+    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
     showEditModal.value = false
     initTableData()
   }
   catch (e) {
-    window.$message?.error('修改失败')
+    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+
   }
 }
 const columns: DataTableColumns<RowData> = [

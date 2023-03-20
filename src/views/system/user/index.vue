@@ -64,7 +64,6 @@ const userInfo = useUserStore()
 const columns: DataTableColumns<RowData> = [
   { title: '用户编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
   { title: '用户名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
-  { title: '用户昵称', key: 'username', width: 150, ellipsis: { tooltip: true } },
   { title: '部门', key: 'departmentId', width: 150, render: row => row.department?.name },
   { title: '手机号码', key: 'phone', width: 150, ellipsis: { tooltip: true } },
   { title: '状态', key: 'status', width: 150, ellipsis: { tooltip: true }, render: row => row.status && status[row.status] },
@@ -105,9 +104,9 @@ const columns: DataTableColumns<RowData> = [
                     id: row.id,
                     password: md5(pwd.value),
                   }).then(() => {
-                    window.$message?.success('修改成功')
+                    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
                   }).catch(() => {
-                    window.$message?.error('修改失败')
+                    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
                   })
                 },
                 content: () => h(
@@ -163,12 +162,12 @@ const handelSaveBtnClick = async () => {
       await api.saveUser(editModal.value)
     else
       await api.updateUser(editModal.value)
-    window.$message?.success('修改成功')
+    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
     showEditModal.value = false
     initTableData()
   }
   catch (e) {
-    window.$message?.error('修改失败')
+    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
   }
 }
 
@@ -242,6 +241,7 @@ onMounted(() => {
         <NButton
           :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')"
           ml="10" type="primary"
+          mr="10"
           @click="() => {
             editModalMode = 1
             editModal = {}
@@ -249,6 +249,22 @@ onMounted(() => {
           }"
         >
           + 新增
+        </NButton>
+        <n-upload
+          inline
+          abstract
+          action="/service/user/import"
+          @finish="initTableData"
+        >
+          <n-upload-trigger #="{ handleClick }" abstract>
+            <NButton type="primary" @click="handleClick">
+              上传
+            </NButton>
+            <n-upload-file-list hidden />
+          </n-upload-trigger>
+        </n-upload>
+        <NButton ml="10" type="primary" @click="initTableData">
+          导出
         </NButton>
       </n-form>
     </div>
@@ -271,23 +287,22 @@ onMounted(() => {
       >
         <n-form ref="formRef" :model="editModal">
           <n-form-item v-if="editModalMode !== 1" path="no" label="工号">
-            <NInput v-model:value="editModal.no" disabled @keydown.enter.prevent />
+            <NInput v-model:value="editModal.no" :disabled="userInfo.role[0] !== 'admin'" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="name" label="姓名">
-            <NInput v-model:value="editModal.name" @keydown.enter.prevent />
-          </n-form-item>
-          <n-form-item path="username" label="昵称">
-            <NInput v-model:value="editModal.username" @keydown.enter.prevent />
+            <NInput v-model:value="editModal.name" :disabled="userInfo.role[0] !== 'admin'" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="roleId" label="部门">
             <n-select
               v-model:value="editModal.departmentId"
+              :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')"
               :options="departmentList.map(department => ({ label: department.name, value: department.id }))"
             />
           </n-form-item>
           <n-form-item path="roleId" label="角色">
             <n-select
-              v-model:value="editModal.roleId" :options="[
+              v-model:value="editModal.roleId"
+              :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')" :options="[
                 { label: '超级管理', value: 1 }, { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 }, { label: '主管', value: 4 },
               ]"
             />
@@ -299,11 +314,12 @@ onMounted(() => {
             <NInput v-model:value="editModal.phone" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="seat" label="座位">
-            <NInput v-model:value="editModal.seat" @keydown.enter.prevent />
+            <NInput v-model:value="editModal.seat" :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="status" label="状态">
             <n-select
-              v-model:value="editModal.status" :options="[
+              v-model:value="editModal.status"
+              :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')" :options="[
                 { label: '离职', value: 0 }, { label: '在职', value: 1 }, { label: '实习生', value: 2 },
               ]"
             />

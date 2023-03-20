@@ -20,7 +20,7 @@ const selectedUserName = ref<string>('')
 const searchUserResult = ref<UserVo[]>([])
 const autoCompleteOptions = computed(() => searchUserResult.value?.map((user) => {
   return {
-    label: user.username,
+    label: user.name,
     value: user.id,
   }
 }) ?? [])
@@ -60,7 +60,7 @@ const columns: DataTableColumns<RowData> = [
   { title: '部门编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
   { title: '部门名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
   { title: '主管工号', key: 'userId', render: row => row.user?.no, width: 150, ellipsis: { tooltip: true } },
-  { title: '主管名称', key: 'userId', render: row => row.user?.username, width: 150, ellipsis: { tooltip: true } },
+  { title: '主管名称', key: 'userId', render: row => row.user?.name, width: 150, ellipsis: { tooltip: true } },
   {
     title: '操作',
     key: 'actions',
@@ -113,12 +113,13 @@ const handelSaveBtnClick = async () => {
       await api.saveDepartment(editModal.value)
     else
       await api.updateDepartment(editModal.value)
-    window.$message?.success('修改成功')
+    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
     showEditModal.value = false
     initTableData()
   }
   catch (e) {
-    window.$message?.error('修改失败')
+    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+
   }
 }
 onMounted(() => {
