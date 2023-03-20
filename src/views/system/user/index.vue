@@ -230,8 +230,8 @@ const getDepartmentList = async () => {
 }
 getDepartmentList()
 const exportData = () => {
-  httpNa.post('/user/export', queryForm).catch((err) => {
-    const blob = new Blob([err.data], { type: 'application/vnd.ms-excel' })
+  httpNa.post('/user/export', queryForm, { responseType: 'blob' }).catch((err) => {
+    const blob = new Blob([err.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
     const cd = err.headers['content-disposition']
     saveAs(blob, cd.substring(cd.indexOf('filename=') + 9))
   })
