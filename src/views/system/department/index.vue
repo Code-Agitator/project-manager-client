@@ -57,14 +57,13 @@ const handleDeleteDepartment = async (id?: number) => {
   }
 }
 const columns: DataTableColumns<RowData> = [
-  { title: '部门编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
-  { title: '部门名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
-  { title: '主管工号', key: 'userId', render: row => row.user?.no, width: 150, ellipsis: { tooltip: true } },
-  { title: '主管名称', key: 'userId', render: row => row.user?.name, width: 150, ellipsis: { tooltip: true } },
+  { title: '部门编号', key: 'id', ellipsis: { tooltip: true } },
+  { title: '部门名称', key: 'name', ellipsis: { tooltip: true } },
+  { title: '主管工号', key: 'userId', render: row => row.user?.no, ellipsis: { tooltip: true } },
+  { title: '主管名称', key: 'userId', render: row => row.user?.name, ellipsis: { tooltip: true } },
   {
     title: '操作',
     key: 'actions',
-    width: 100,
     render(row) {
       return [
         h(
@@ -168,7 +167,7 @@ onMounted(() => {
       :row-key="(row:RowData) => row.id"
       :data="tableData"
       :pagination="pagination"
-      :scroll-x="1600"
+
       :loading="loading"
     />
 

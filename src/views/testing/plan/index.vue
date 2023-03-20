@@ -183,13 +183,21 @@ onMounted(() => {
                 <n-input
                   :value="slotValue"
                   placeholder="负责人"
+                  @focus="() => {
+                    userApi.searchUser({ name: '' }).then((res) => {
+                      searchUserResultInQuery = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResultInQuery = []
+                    })
+                    handleInput(' ')
+                  }"
                   @input="(name) => {
                     userApi.searchUser({ name }).then((res) => {
                       searchUserResultInQuery = res.data.records ?? []
                     }).catch(e => {
                       searchUserResultInQuery = []
                     })
-                    handleInput(name)
+                    handleInput(name.trimStart())
                   }"
                 />
               </template>
@@ -223,7 +231,6 @@ onMounted(() => {
       :row-key="(row:RowData) => row.id"
       :data="tableData"
       :pagination="pagination"
-      :scroll-x="1600"
       :loading="loading"
     />
 

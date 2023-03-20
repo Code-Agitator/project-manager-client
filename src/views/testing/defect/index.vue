@@ -207,7 +207,6 @@ const handelSaveBtnClick = async () => {
   }
   catch (e) {
     window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-
   }
 }
 
@@ -217,7 +216,6 @@ const getDepartmentList = async () => {
   departmentList.value = data?.records ?? []
 }
 getDepartmentList()
-
 onMounted(() => {
   initTableData()
   if (isDev)
@@ -318,7 +316,6 @@ onMounted(() => {
       :row-key="(row:RowData) => row.id"
       :data="tableData"
       :pagination="pagination"
-      :scroll-x="1600"
       :loading="loading"
     />
 
@@ -332,7 +329,7 @@ onMounted(() => {
             <n-input v-model:value="editModal.title" :disabled="isDev" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="comment" label="备注">
-            <n-input v-model:value="editModal.comment" @keydown.enter.prevent />
+            <n-input v-model:value="editModal.comment" :disabled="isDev" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="level" label="严重程度">
             <n-select
