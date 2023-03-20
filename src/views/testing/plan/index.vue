@@ -82,7 +82,6 @@ const handelSaveBtnClick = async () => {
   }
   catch (e) {
     window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-
   }
 }
 const columns: DataTableColumns<RowData> = [
@@ -246,7 +245,7 @@ onMounted(() => {
           >
             <NButton>上传文件</NButton>
           </n-upload>
-          <n-form-item path="userId" label="部门主管">
+          <n-form-item path="userId" label="负责人">
             <n-auto-complete
               v-model:value="selectedUserName" :options="autoCompleteOptions"
               @select="selected"
@@ -257,13 +256,21 @@ onMounted(() => {
                 <n-input
                   :value="slotValue"
                   placeholder="负责人"
+                  @focus="(event) => {
+                    userApi.searchUser({ name: '' }).then((res) => {
+                      searchUserResult = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResult = []
+                    })
+                    handleInput(' ')
+                  }"
                   @input="(name) => {
                     userApi.searchUser({ name }).then((res) => {
                       searchUserResult = res.data.records ?? []
                     }).catch(e => {
                       searchUserResult = []
                     })
-                    handleInput(name)
+                    handleInput(name.trimStart())
                   }"
                 />
               </template>

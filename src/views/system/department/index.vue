@@ -119,7 +119,6 @@ const handelSaveBtnClick = async () => {
   }
   catch (e) {
     window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-
   }
 }
 onMounted(() => {
@@ -192,14 +191,22 @@ onMounted(() => {
               >
                 <n-input
                   :value="slotValue"
-                  placeholder="选择主管"
-                  @input="(name) => {
-                    userApi.searchUser({ name }).then((res) => {
+                  placeholder="负责人"
+                  @focus="(event) => {
+                    userApi.searchUser({ name: '', roleId: 2 }).then((res) => {
                       searchUserResult = res.data.records ?? []
                     }).catch(e => {
                       searchUserResult = []
                     })
-                    handleInput(name)
+                    handleInput(' ')
+                  }"
+                  @input="(name) => {
+                    userApi.searchUser({ name, roleId: 2 }).then((res) => {
+                      searchUserResult = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResult = []
+                    })
+                    handleInput(name.trimStart())
                   }"
                 />
               </template>
