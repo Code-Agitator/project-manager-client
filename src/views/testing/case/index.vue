@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { DataTableColumns } from 'naive-ui'
+import type { DataTableColumns, FormItemRule } from 'naive-ui'
 import { NButton } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
+import type { FormRules } from 'naive-ui/es/form/src/interface'
 import api from '@/views/testing/case/api'
 import planApi from '@/views/testing/plan/api'
 import userApi from '@/views/system/user/api'
@@ -81,6 +82,15 @@ const initTableData = () => {
     pagination.pageCount = res.data?.pages
     pagination.itemCount = res.data?.total
   }).finally(() => { loading.value = false })
+}
+const rules: FormRules = {
+  link: { required: true, trigger: ['input', 'blur'] },
+  name: { required: true, trigger: ['input', 'blur'] },
+  plantId: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+  },
 }
 
 const handleDeletePlan = async (id?: number) => {
@@ -278,14 +288,14 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="editModal">
-          <n-form-item path="title" label="用例标题">
+        <n-form ref="formRef" :model="editModal" :rules="rules" :validate-messages="{ required: '该项不能为空' }">
+          <n-form-item path="name" label="用例标题">
             <n-input v-model:value="editModal.name" @keydown.enter.prevent />
           </n-form-item>
-          <n-form-item path="title" label="用例备注">
+          <n-form-item path="comment" label="用例备注">
             <n-input v-model:value="editModal.comment" @keydown.enter.prevent />
           </n-form-item>
-          <n-form-item path="title" label="用例链接">
+          <n-form-item path="link" label="用例链接">
             <n-input v-model:value="editModal.link" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="title" label="测试结果">

@@ -32,7 +32,7 @@ const autoCompleteOptions = computed(() => searchUserResult.value?.map((user) =>
   }
 }) ?? [])
 const selected = (str: number) => {
-  editModal.value.userId = str
+  editModal.value.reportUserId = str
 }
 
 const selectedUserName2 = ref<string>('')
@@ -105,27 +105,27 @@ const rules: FormRules = {
   type: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
   },
   priority: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
   },
   level: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
   },
   repeatedProbability: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
   },
   status: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
   },
 }
 
@@ -206,14 +206,14 @@ const columns: DataTableColumns<RowData> = [
     key: 'reportUser',
     width: 150,
     ellipsis: { tooltip: true },
-    render: row => row.reportUser?.username ?? '-',
+    render: row => row.reportUser?.name ?? '-',
   },
   {
     title: '经办人',
     key: 'user',
     width: 150,
     ellipsis: { tooltip: true },
-    render: row => row.user?.username ?? '-',
+    render: row => row.user?.name ?? '-',
   },
   { title: '缺陷描述', key: 'comment', width: 150, ellipsis: { tooltip: true } },
   {
@@ -442,6 +442,7 @@ onMounted(() => {
                 #default="{ handleInput, value: slotValue }"
               >
                 <n-input
+                  :disabled="isDev"
                   :value="slotValue"
                   placeholder="报告人"
                   @focus="(event) => {
@@ -464,7 +465,7 @@ onMounted(() => {
               </template>
             </n-auto-complete>
           </n-form-item>
-          <n-form-item path="userId" label="报告人">
+          <n-form-item path="userId" label="经办人">
             <n-auto-complete
               v-model:value="selectedUserName2" :options="autoCompleteOptions2"
               @select="selected2"
@@ -473,8 +474,9 @@ onMounted(() => {
                 #default="{ handleInput, value: slotValue }"
               >
                 <n-input
+                  :disabled="isDev"
                   :value="slotValue"
-                  placeholder="报告人"
+                  placeholder="经办人"
                   @focus="(event) => {
                     userApi.searchUser({ name: '' }).then((res) => {
                       searchUserResult2 = res.data.records ?? []

@@ -32,27 +32,27 @@ const rules: FormRules = {
   departmentId: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
   },
   roleId: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
   },
   email: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value: string) => !/^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/.test(value) && Promise.reject(Error('邮箱格式有误')),
+    validator: (rule: FormItemRule, value: string) => !/[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/.test(value) ? Promise.reject(Error('邮箱格式有误')) : true,
   },
   phone: {
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value: string) => !/^[1]+[3,8]+\\d{9}$/.test(value) && Promise.reject(Error('手机号格式有误')),
+    validator: (rule: FormItemRule, value: string) => !/[1][3,4,5,7,8][0-9]{9}/.test(value) ? Promise.reject(Error('手机号格式有误')) : true,
   },
   seat: { required: true, trigger: ['input', 'blur'] },
   status: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined && Promise.reject(Error('该项不能为空')),
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
   },
 }
 
