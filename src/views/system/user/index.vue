@@ -122,8 +122,7 @@ const columns: DataTableColumns<RowData> = [
     render(row) {
       const role = userInfo.role[0]
       const isAdmin = role === 'admin' || role === 'major'
-      const isSelf = row.id === (userInfo.userId as unknown as number)
-
+      const isSelf = row.id === userInfo.userId
       return [
         h(
           NButton,
@@ -177,7 +176,7 @@ const columns: DataTableColumns<RowData> = [
             strong: true,
             tertiary: true,
             size: 'small',
-            disabled: !isAdmin,
+            disabled: !isAdmin && !isSelf,
             style: { marginLeft: '10px' },
             onClick: () => {
               editModalMode.value = 2
@@ -229,11 +228,16 @@ const getDepartmentList = async () => {
   departmentList.value = data?.records ?? []
 }
 getDepartmentList()
+const exportBtnDisable = ref<boolean>(false)
+const importBtnDisable = ref<boolean>(false)
 const exportData = () => {
+  exportBtnDisable.value = true
   httpNa.post('/user/export', queryForm, { responseType: 'blob' }).catch((err) => {
     const blob = new Blob([err.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
     const cd = err.headers['content-disposition']
     saveAs(blob, cd.substring(cd.indexOf('filename=') + 9))
+  }).finally(() => {
+    exportBtnDisable.value = false
   })
 }
 
@@ -313,17 +317,23 @@ onMounted(() => {
           inline
           abstract
           action="/service/user/import"
-          @finish="initTableData"
+          @before-upload="() => {
+            importBtnDisable = true
+          }"
+          @finish="() => {
+            importBtnDisable = false
+            initTableData()
+          }"
         >
           <n-upload-trigger #="{ handleClick }" abstract>
-            <NButton type="primary" @click="handleClick">
+            <NButton :loading="importBtnDisable" type="primary" @click="handleClick">
               批量导入
             </NButton>
             <n-upload-file-list hidden />
           </n-upload-trigger>
         </n-upload>
         <NButton
-          ml="10" type="primary" @click="exportData()"
+          ml="10" type="primary" :loading="exportBtnDisable" :disabled="exportBtnDisable" @click="exportData()"
         >
           导出
         </NButton>

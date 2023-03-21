@@ -19,6 +19,7 @@ export default {
       component: () => import('@/views/system/user/index.vue'),
       meta: {
         title: '用户管理',
+        role: ['admin'],
         icon: 'logos:unocss',
         requireAuth: true,
       },

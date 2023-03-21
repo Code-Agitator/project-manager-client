@@ -7,10 +7,10 @@ import planApi from '@/views/testing/plan/api'
 import userApi from '@/views/system/user/api'
 
 import type { TestingPlanVo } from '@/views/testing/plan/type/response'
-import type { TestingPlanSearchDto } from '@/views/testing/plan/type/request'
 import type { TestingCaseVo } from '@/views/testing/case/type/response'
 import type { UserVo } from '@/views/system/user/type/response'
 import type { TestingCaseSearchDto } from '@/views/testing/case/type/request'
+import { useUserStore } from '@/store'
 
 const editModalMode = ref<number>(1)
 const tableData = ref<RowData[]>([])
@@ -96,10 +96,12 @@ const handleDeletePlan = async (id?: number) => {
   }
 }
 
+const userStore = useUserStore()
+
 const handelSaveBtnClick = async () => {
   try {
     if (editModalMode.value === 1)
-      await api.saveCase(editModal.value)
+      (editModal.value.userId = userStore.userInfo.id) && await api.saveCase(editModal.value)
     else
       await api.updateCase(editModal.value)
     window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
@@ -220,7 +222,7 @@ onMounted(() => {
                   :value="slotValue"
                   placeholder="测试计划"
                   @focus="() => {
-                    planApi.searchPlan({ name: '' }).then((res) => {
+                    planApi.searchPlan({ name: ' ' }).then((res) => {
                       searchPlanResultInQuery = res.data.records ?? []
                     }).catch(e => {
                       searchPlanResultInQuery = []
@@ -290,30 +292,6 @@ onMounted(() => {
             <n-input v-model:value="editModal.result" @keydown.enter.prevent />
           </n-form-item>
 
-          <n-form-item path="userId" label="输出者">
-            <n-auto-complete
-              v-model:value="selectedUserName" :options="autoCompleteUserOptions"
-              @select="userSelected"
-            >
-              <template
-                #default="{ handleInput, value: slotValue }"
-              >
-                <n-input
-                  :value="slotValue"
-                  placeholder="负责人"
-                  @input="(name) => {
-                    userApi.searchUser({ name }).then((res) => {
-                      searchUserResult = res.data.records ?? []
-                    }).catch(e => {
-                      searchUserResult = []
-                    })
-                    handleInput(name)
-                  }"
-                />
-              </template>
-            </n-auto-complete>
-          </n-form-item>
-
           <n-form-item path="plantId" label="用例计划">
             <n-auto-complete
               v-model:value="selectedPlanName" :options="autoCompletePlanOptions"
@@ -325,6 +303,14 @@ onMounted(() => {
                 <n-input
                   :value="slotValue"
                   placeholder="请选择"
+                  @focus="() => {
+                    planApi.searchPlan({ name: ' ' }).then((res) => {
+                      searchPlanResult = res.data.records ?? []
+                    }).catch(e => {
+                      searchPlanResult = []
+                    })
+                    handleInput(' ')
+                  }"
                   @input="(name) => {
                     planApi.searchPlan({ name }).then((res) => {
                       searchPlanResult = res.data.records ?? []

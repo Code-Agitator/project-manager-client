@@ -3,7 +3,7 @@ import { removeToken } from '@/utils/auth/token'
 import { toLogin } from '@/utils/auth/router'
 
 interface UserInfo {
-  id?: number | string
+  id?: number
   name?: string
   avatar?: string
   role?: Array<string>
@@ -18,8 +18,8 @@ export const useUserStore = defineStore('user', {
     }
   },
   getters: {
-    userId(): string {
-      return <string> this.userInfo.id || ''
+    userId(): number | undefined {
+      return <number> this.userInfo.id || undefined
     },
     name(): string {
       return this.userInfo.name || ''
@@ -50,6 +50,7 @@ export const useUserStore = defineStore('user', {
           res.role.menu && (this.userInfo.menu = JSON.parse(res.role.menu))
           this.userInfo.role = [res?.role?.roleCode]
           this.userInfo.name = res.name
+          this.userInfo.id = res.id
           return Promise.resolve(res)
         }
         else {

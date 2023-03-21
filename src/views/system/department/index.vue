@@ -192,7 +192,7 @@ onMounted(() => {
                   :value="slotValue"
                   placeholder="负责人"
                   @focus="(event) => {
-                    userApi.searchUser({ name: '', roleId: 2 }).then((res) => {
+                    userApi.searchUser({ name: '' }).then((res) => {
                       searchUserResult = res.data.records ?? []
                     }).catch(e => {
                       searchUserResult = []
@@ -200,7 +200,7 @@ onMounted(() => {
                     handleInput(' ')
                   }"
                   @input="(name) => {
-                    userApi.searchUser({ name, roleId: 2 }).then((res) => {
+                    userApi.searchUser({ name }).then((res) => {
                       searchUserResult = res.data.records ?? []
                     }).catch(e => {
                       searchUserResult = []

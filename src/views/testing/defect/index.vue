@@ -5,10 +5,12 @@ import type { PaginationProps } from 'naive-ui/es/pagination'
 import type { FormRules } from 'naive-ui/es/form/src/interface'
 import defectApi from '@/views/testing/defect/api'
 import departmentApi from '@/views/system/department/api'
+import userApi from '@/views/system/user/api'
 import type { DefectVo } from '@/views/testing/defect/type/response'
 import type { DepartmentVo } from '@/views/system/department/type/response'
 import type { DefectSearchParam } from '@/views/testing/defect/type/request'
 import { useUserStore } from '@/store'
+import type { UserVo } from '@/views/system/user/type/response'
 
 const editModalMode = ref<number>(1)
 const tableData = ref<RowData[]>([])
@@ -20,6 +22,30 @@ const pagination = reactive<PaginationProps>({
 })
 const userInfo = useUserStore()
 const isDev = userInfo.role[0] === 'dev'
+
+const selectedUserName = ref<string>('')
+const searchUserResult = ref<UserVo[]>([])
+const autoCompleteOptions = computed(() => searchUserResult.value?.map((user) => {
+  return {
+    label: user.name,
+    value: user.id,
+  }
+}) ?? [])
+const selected = (str: number) => {
+  editModal.value.userId = str
+}
+
+const selectedUserName2 = ref<string>('')
+const searchUserResult2 = ref<UserVo[]>([])
+const autoCompleteOptions2 = computed(() => searchUserResult2.value?.map((user) => {
+  return {
+    label: user.name,
+    value: user.id,
+  }
+}) ?? [])
+const selected2 = (str: number) => {
+  editModal.value.userId = str
+}
 
 interface RowData extends DefectVo {
 }
@@ -129,7 +155,7 @@ const handleDeleteDefect = async (id?: number) => {
   }
 }
 const columns: DataTableColumns<RowData> = [
-  { title: '缺陷编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
+  { title: '缺陷编号', key: 'id', width: 120, ellipsis: { tooltip: true } },
   { title: '缺陷标题', key: 'title', width: 150, ellipsis: { tooltip: true } },
   {
     title: '缺陷类型',
@@ -254,7 +280,7 @@ getDepartmentList()
 onMounted(() => {
   initTableData()
   if (isDev)
-    queryForm.value.userId = userInfo.userId as unknown as number
+    queryForm.value.userId = userInfo.userId
 
   pagination.onUpdatePage = (page) => {
     pagination.page = page
@@ -406,6 +432,68 @@ onMounted(() => {
               }))"
               placeholder="请选择重复概率"
             />
+          </n-form-item>
+          <n-form-item path="userId" label="报告人">
+            <n-auto-complete
+              v-model:value="selectedUserName" :options="autoCompleteOptions"
+              @select="selected"
+            >
+              <template
+                #default="{ handleInput, value: slotValue }"
+              >
+                <n-input
+                  :value="slotValue"
+                  placeholder="报告人"
+                  @focus="(event) => {
+                    userApi.searchUser({ name: '' }).then((res) => {
+                      searchUserResult = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResult = []
+                    })
+                    handleInput(' ')
+                  }"
+                  @input="(name) => {
+                    userApi.searchUser({ name }).then((res) => {
+                      searchUserResult = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResult = []
+                    })
+                    handleInput(name.trimStart())
+                  }"
+                />
+              </template>
+            </n-auto-complete>
+          </n-form-item>
+          <n-form-item path="userId" label="报告人">
+            <n-auto-complete
+              v-model:value="selectedUserName2" :options="autoCompleteOptions2"
+              @select="selected2"
+            >
+              <template
+                #default="{ handleInput, value: slotValue }"
+              >
+                <n-input
+                  :value="slotValue"
+                  placeholder="报告人"
+                  @focus="(event) => {
+                    userApi.searchUser({ name: '' }).then((res) => {
+                      searchUserResult2 = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResult2 = []
+                    })
+                    handleInput(' ')
+                  }"
+                  @input="(name) => {
+                    userApi.searchUser({ name }).then((res) => {
+                      searchUserResult2 = res.data.records ?? []
+                    }).catch(e => {
+                      searchUserResult2 = []
+                    })
+                    handleInput(name.trimStart())
+                  }"
+                />
+              </template>
+            </n-auto-complete>
           </n-form-item>
           <n-form-item path="comment" label="备注">
             <n-input v-model:value="editModal.comment" :disabled="isDev" @keydown.enter.prevent />
