@@ -349,7 +349,7 @@ onMounted(() => {
       :row-key="(row:RowData) => row.id"
       :data="tableData"
       :pagination="pagination"
-      :scroll-x="1000"
+      :scroll-x="1500"
       :loading="loading"
     />
 

@@ -378,6 +378,7 @@ onMounted(() => {
       :data="tableData"
       :pagination="pagination"
       :loading="loading"
+      :scroll-x="1800"
     />
 
     <n-modal v-model:show="showEditModal" :mask-closable="false">
