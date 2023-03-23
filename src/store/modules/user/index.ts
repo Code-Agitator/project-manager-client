@@ -9,6 +9,9 @@ interface UserInfo {
   role?: Array<string>
   departmentId?: string
   menu?: Array<string>
+  email?: string
+  roleName?: string
+  createdTime?: string
 }
 
 export const useUserStore = defineStore('user', {
@@ -29,6 +32,15 @@ export const useUserStore = defineStore('user', {
     },
     departmentId(): string {
       return this.userInfo.departmentId || ''
+    },
+    email(): string {
+      return this.userInfo.email || ''
+    },
+    roleName(): string {
+      return this.userInfo.roleName || ''
+    },
+    createdTime(): string {
+      return this.userInfo.createdTime || ''
     },
     role(): Array<string> {
       return this.userInfo.role || []
@@ -51,6 +63,10 @@ export const useUserStore = defineStore('user', {
           this.userInfo.role = [res?.role?.roleCode]
           this.userInfo.name = res.name
           this.userInfo.id = res.id
+          this.userInfo.departmentId = res.departmentId
+          this.userInfo.email = res.email
+          this.userInfo.roleName = res.role.roleName
+          this.userInfo.createdTime = res.createTime
           return Promise.resolve(res)
         }
         else {

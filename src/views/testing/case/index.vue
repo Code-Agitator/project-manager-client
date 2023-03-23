@@ -123,7 +123,7 @@ const handelSaveBtnClick = async () => {
   }
 }
 const columns: DataTableColumns<RowData> = [
-  { title: '用例编号', key: 'id', width: 120, ellipsis: { tooltip: true } },
+  { title: '用例编号', key: 'id', ellipsis: { tooltip: true } },
   { title: '测试计划', key: 'plantId', ellipsis: { tooltip: true }, render: row => row.testingPlan?.name },
   { title: '用例标题', key: 'name', ellipsis: { tooltip: true } },
   { title: '输出者', key: 'userId', ellipsis: { tooltip: true }, render: row => row.user?.name },
@@ -289,19 +289,6 @@ onMounted(() => {
         aria-modal="true" closable @close="showEditModal = false"
       >
         <n-form ref="formRef" :model="editModal" :rules="rules" :validate-messages="{ required: '该项不能为空' }">
-          <n-form-item path="name" label="用例标题">
-            <n-input v-model:value="editModal.name" @keydown.enter.prevent />
-          </n-form-item>
-          <n-form-item path="comment" label="用例备注">
-            <n-input v-model:value="editModal.comment" @keydown.enter.prevent />
-          </n-form-item>
-          <n-form-item path="link" label="用例链接">
-            <n-input v-model:value="editModal.link" @keydown.enter.prevent />
-          </n-form-item>
-          <n-form-item path="title" label="测试结果">
-            <n-input v-model:value="editModal.result" @keydown.enter.prevent />
-          </n-form-item>
-
           <n-form-item path="plantId" label="用例计划">
             <n-auto-complete
               v-model:value="selectedPlanName" :options="autoCompletePlanOptions"
@@ -332,6 +319,19 @@ onMounted(() => {
                 />
               </template>
             </n-auto-complete>
+          </n-form-item>
+
+          <n-form-item path="name" label="用例标题">
+            <n-input v-model:value="editModal.name" @keydown.enter.prevent />
+          </n-form-item>
+          <n-form-item path="link" label="用例链接">
+            <n-input v-model:value="editModal.link" @keydown.enter.prevent />
+          </n-form-item>
+          <n-form-item path="title" label="测试结果">
+            <n-input v-model:value="editModal.result" @keydown.enter.prevent />
+          </n-form-item>
+          <n-form-item path="comment" label="用例备注">
+            <n-input v-model:value="editModal.comment" @keydown.enter.prevent />
           </n-form-item>
 
           <n-row :gutter="[0, 24]">

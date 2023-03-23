@@ -1,7 +1,7 @@
 import type { App } from 'vue'
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import { setupRouterGuard } from './guard'
-import { EMPTY_ROUTE, NOT_FOUND_ROUTE, basicRoutes as routes } from './routes'
+import { EMPTY_ROUTE, NOT_FOUND_ROUTE, basicRoutes, basicRoutes as routes } from './routes'
 import { usePermissionStore, useUserStore } from '@/store'
 import type { RouteType } from '~/types/router'
 
@@ -17,6 +17,9 @@ export async function resetRouter() {
   router.getRoutes().forEach((route) => {
     const { name } = route
     router.hasRoute(name!) && router.removeRoute(name!)
+  })
+  basicRoutes.forEach((value) => {
+    router.addRoute(value)
   })
   await addDynamicRoutes()
 }

@@ -86,6 +86,7 @@ const columns: DataTableColumns<RowData> = [
             strong: true,
             tertiary: true,
             size: 'small',
+            disabled: row.id === 1,
             onClick: () => {
               editModalMode.value = 2
               editModal.value = row
@@ -100,6 +101,7 @@ const columns: DataTableColumns<RowData> = [
           {
             strong: true,
             tertiary: true,
+            disabled: row.id === 1,
             size: 'small',
             style: { marginLeft: '10px' },
             onClick: () => handleDeleteRole(row.id),
@@ -124,7 +126,6 @@ const handelSaveBtnClick = async () => {
   }
   catch (e) {
     window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-
   }
   finally {
     editModal.value.menu = ''

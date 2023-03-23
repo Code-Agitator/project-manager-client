@@ -95,10 +95,12 @@ const handleDeleteUser = async (id?: number) => {
 const dialog = useDialog()
 const userInfo = useUserStore()
 const columns: DataTableColumns<RowData> = [
-  { title: '用户编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
+  { title: '用户编号', key: 'id', width: 120, ellipsis: { tooltip: true } },
   { title: '用户名称', key: 'name', width: 150, ellipsis: { tooltip: true } },
+  { title: '角色', key: 'roleId', width: 150, render: row => row.role?.roleName, ellipsis: { tooltip: true } },
   { title: '部门', key: 'departmentId', width: 150, render: row => row.department?.name },
   { title: '手机号码', key: 'phone', width: 150, ellipsis: { tooltip: true } },
+  { title: '邮箱', key: 'email', width: 150, render: row => row.email, ellipsis: { tooltip: true } },
   {
     title: '状态',
     key: 'status',
@@ -347,6 +349,7 @@ onMounted(() => {
       :row-key="(row:RowData) => row.id"
       :data="tableData"
       :pagination="pagination"
+      :scroll-x="1000"
       :loading="loading"
     />
 
@@ -360,7 +363,7 @@ onMounted(() => {
             <NInput v-model:value="editModal.no" :disabled="userInfo.role[0] !== 'admin'" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="name" label="姓名">
-            <NInput v-model:value="editModal.name" :disabled="userInfo.role[0] !== 'admin'" @keydown.enter.prevent />
+            <NInput v-model:value="editModal.name" :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="departmentId" label="部门">
             <n-select

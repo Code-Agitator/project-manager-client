@@ -109,6 +109,7 @@ const columns: DataTableColumns<RowData> = [
             strong: true,
             tertiary: true,
             size: 'small',
+            disabled: !(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major'),
             onClick: () => {
               editModalMode.value = 2
               editModal.value = row
@@ -124,6 +125,8 @@ const columns: DataTableColumns<RowData> = [
             strong: true,
             tertiary: true,
             size: 'small',
+            disabled: !(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major'),
+
             style: { marginLeft: '10px' },
             onClick: () => handleDeletePlan(row.id),
           },

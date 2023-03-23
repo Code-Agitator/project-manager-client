@@ -14,7 +14,8 @@ function hasPermission(route: RouteType, role: string[], menu: Array<string> = [
   if (!role.length || !routeRole.length)
     return false
   // * 路由指定的角色包含任一登录用户角色则判定有权限
-  console.log(route.name, menu.includes(route.name))
+
+  console.log(role[0], route.name, menu.includes(route.name))
   return menu.includes(route.name)
 }
 

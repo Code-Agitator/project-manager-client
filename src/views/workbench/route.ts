@@ -15,7 +15,7 @@ export default {
       path: 'workbench',
       component: () => import('./index.vue'),
       meta: {
-        title: '工作台',
+        title: '个人信息',
         icon: 'mdi:home',
       },
     },

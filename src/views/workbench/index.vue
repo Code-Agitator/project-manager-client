@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { timeFormat } from '@/utils/common/timeUtil'
 import { useUserStore } from '@/store'
 import AppFooter from '@/components/common/AppFooter.vue'
 import api from '@/views/workbench/api'
 import type { SystemStatistical } from '@/views/workbench/type/response'
-
 const dataList = ref<SystemStatistical>({})
 
 const init = () => {
@@ -52,65 +52,49 @@ const userStore = useUserStore()
               他日若遂凌云志，敢笑黄巢不丈夫~
             </n-gradient-text>
           </div>
-          <div ml-auto items-center hidden md:flex>
-            <n-statistic label="待办" :value="4" w-80>
-              <template #suffix>
-                / 10
-              </template>
-            </n-statistic>
-            <n-statistic label="Stars" w-80 ml-20>
-              <a href="https://github.com/zclzone/qs-admin">
-                <img allt="stars" src="https://badgen.net/github/stars/zclzone/qs-admin">
-              </a>
-            </n-statistic>
-            <n-statistic label="Forks" w-80 ml-20>
-              <a href="https://github.com/zclzone/qs-admin">
-                <img allt="forks" src="https://badgen.net/github/forks/zclzone/qs-admin">
-              </a>
-            </n-statistic>
-          </div>
         </div>
       </n-card>
     </n-watermark>
 
-    <n-card title="项目" size="small" :segmented="true" mt-15 rounded-10>
-      <template #header-extra>
-        <n-button text type="primary">
-          更多
-        </n-button>
-      </template>
-      <div flex flex-wrap justify-around>
-        <n-card
-          title="数据"
-          :segmented="{
-            content: true,
-            footer: 'soft',
-          }"
-        >
-          <template #header-extra>
-            <icon-material-symbols-refresh text-true-gray text-25 mr-2 />
-            <n-switch @update:value="handleAutoRefreshChange" />
-          </template>
-
-          <n-grid :cols="5">
-            <n-gi>
-              <n-statistic label="用户数" :value="dataList.userCount" />
-            </n-gi>
-            <n-gi>
-              <n-statistic label="在线人数" :value="dataList.onlineUserCount" />
-            </n-gi>
-            <n-gi>
-              <n-statistic label="动态数" :value="dataList.dynamicCount" />
-            </n-gi>
-          </n-grid>
-        </n-card>
-        <div w-300 h-0 />
-        <div w-300 h-0 />
-        <div w-300 h-0 />
-        <div w-300 h-0 />
+    <n-card title="个人信息" size="small" :segmented="true" mt-15 rounded-10>
+      <div>
+        <table width="600px" border="1" cellspacing="0" cellpadding="0" border-color="#eeeeee" class="table-style">
+          <tr>
+            <td>用户名：</td>
+            <td>{{ userStore.userInfo.name }}</td>
+          </tr>
+          <tr>
+            <td>邮箱：</td>
+            <td>{{ userStore.userInfo.email }}</td>
+          </tr>
+          <tr>
+            <td>角色：</td>
+            <td>{{ userStore.userInfo.roleName }}</td>
+          </tr>
+          <tr>
+            <td>加入时间：</td>
+            <td>
+              {{ timeFormat(userStore.userInfo.createdTime) }}
+            </td>
+          </tr>
+        </table>
       </div>
+
+      <div w-300 h-0 />
+      <div w-300 h-0 />
+      <div w-300 h-0 />
+      <div w-300 h-0 />
     </n-card>
 
     <AppFooter mt-20 />
   </div>
 </template>
+
+<style>
+.table-style{
+
+}
+.table-style>tr>td{
+padding: 12px;
+}
+</style>
