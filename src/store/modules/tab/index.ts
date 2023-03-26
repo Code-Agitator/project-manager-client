@@ -42,6 +42,9 @@ export const useTabStore = defineStore('tab', {
       }
       this.setTabs(this.tabs.filter(tab => tab.path !== path))
     },
+    removeAll() {
+      this.setTabs([])
+    },
     removeOther(curPath: string) {
       this.setTabs(this.tabs.filter(tab => tab.path === curPath))
       if (curPath !== this.activeTab)

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DataTableColumns, FormItemRule } from 'naive-ui'
+import type { DataTableColumns, FormInst, FormItemRule } from 'naive-ui'
 import { NButton } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
 import type { FormRules } from 'naive-ui/es/form/src/interface'
@@ -84,12 +84,12 @@ const initTableData = () => {
   }).finally(() => { loading.value = false })
 }
 const rules: FormRules = {
-  link: { required: true, trigger: ['input', 'blur'] },
-  name: { required: true, trigger: ['input', 'blur'] },
+  link: { required: true, trigger: ['input', 'blur'], validator: (rule: FormItemRule, value?: string) => value === undefined || value === '' ? Promise.reject(Error('链接不能为空')) : true },
+  name: { required: true, trigger: ['input', 'blur'], validator: (rule: FormItemRule, value?: string) => value === undefined || value === '' ? Promise.reject(Error('名称不能为空')) : true },
   plantId: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('测试计划不能为空')) : true,
   },
 }
 
@@ -107,20 +107,25 @@ const handleDeletePlan = async (id?: number) => {
 }
 
 const userStore = useUserStore()
+const formRef = ref<FormInst | null>(null)
 
 const handelSaveBtnClick = async () => {
-  try {
-    if (editModalMode.value === 1)
-      (editModal.value.userId = userStore.userInfo.id) && await api.saveCase(editModal.value)
-    else
-      await api.updateCase(editModal.value)
-    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
-    showEditModal.value = false
-    initTableData()
-  }
-  catch (e) {
-    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-  }
+  formRef.value?.validate(async (errors) => {
+    if (!errors) {
+      try {
+        if (editModalMode.value === 1)
+          (editModal.value.userId = userStore.userInfo.id) && await api.saveCase(editModal.value)
+        else
+          await api.updateCase(editModal.value)
+        window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
+        showEditModal.value = false
+        initTableData()
+      }
+      catch (e) {
+        window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+      }
+    }
+  })
 }
 const columns: DataTableColumns<RowData> = [
   { title: '用例编号', key: 'id', ellipsis: { tooltip: true } },
@@ -144,7 +149,7 @@ const columns: DataTableColumns<RowData> = [
             size: 'small',
             onClick: () => {
               editModalMode.value = 2
-              editModal.value = row
+              editModal.value = JSON.parse(JSON.stringify(row))
               showEditModal.value = true
               row.user?.name && (selectedUserName.value = row.user.name)
               row.testingPlan?.name && (selectedPlanName.value = row.testingPlan.name)
@@ -178,7 +183,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card h-full>
+  <n-card style="min-height: 100%">
     <div bg-white w-full>
       <n-form
         label-placement="left"
@@ -208,7 +213,7 @@ onMounted(() => {
                     handleInput(' ')
                   }"
                   @input="(name) => {
-                    userApi.searchUser({ name }).then((res) => {
+                    userApi.searchUser({ name: name.trimStart() }).then((res) => {
                       searchUserResultInQuery = res.data.records ?? []
                     }).catch(e => {
                       searchUserResultInQuery = []
@@ -240,7 +245,7 @@ onMounted(() => {
                     handleInput(' ')
                   }"
                   @input="(name) => {
-                    planApi.searchPlan({ name }).then((res) => {
+                    planApi.searchPlan({ name: name.trimStart() }).then((res) => {
                       searchPlanResultInQuery = res.data.records ?? []
                     }).catch(e => {
                       searchPlanResultInQuery = []
@@ -255,6 +260,19 @@ onMounted(() => {
           <n-form-item-gi>
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
+            </NButton>
+            <NButton
+              ml="10" type="primary" @click="() => {
+                selectedPlanNameInQuery = null
+                selectedUserNameInQuery = null
+                queryForm = {
+                  plantId: null,
+                  userId: null,
+                  name: null,
+                }
+              }"
+            >
+              重置
             </NButton>
           </n-form-item-gi>
         </n-grid>
@@ -288,7 +306,7 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="editModal" :rules="rules" :validate-messages="{ required: '该项不能为空' }">
+        <n-form ref="formRef" :model="editModal" :rules="rules">
           <n-form-item path="plantId" label="用例计划">
             <n-auto-complete
               v-model:value="selectedPlanName" :options="autoCompletePlanOptions"
@@ -328,7 +346,7 @@ onMounted(() => {
             <n-input v-model:value="editModal.link" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="title" label="测试结果">
-            <n-input v-model:value="editModal.result" @keydown.enter.prevent />
+            <n-select v-model:value="editModal.result" :options="[{ label: 'PASS', value: 'PASS' }, { label: 'FAIL', value: 'FAIL' }]" />
           </n-form-item>
           <n-form-item path="comment" label="用例备注">
             <n-input v-model:value="editModal.comment" @keydown.enter.prevent />

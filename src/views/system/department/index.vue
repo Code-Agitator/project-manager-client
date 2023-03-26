@@ -74,7 +74,7 @@ const columns: DataTableColumns<RowData> = [
             size: 'small',
             onClick: () => {
               editModalMode.value = 2
-              editModal.value = row
+              editModal.value = JSON.parse(JSON.stringify(row))
               showEditModal.value = true
               row.user?.name && (selectedUserName.value = row.user.name)
             },
@@ -130,7 +130,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card h-full>
+  <n-card style="min-height: 100%">
     <div bg-white w-full>
       <n-form
         label-placement="left"
@@ -144,6 +144,15 @@ onMounted(() => {
             <n-input v-model:value="queryForm.keywords" />
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
+            </NButton>
+            <NButton
+              ml="10" type="primary" @click="() => {
+                queryForm = {
+                  keywords: '',
+                }
+              }"
+            >
+              重置
             </NButton>
           </n-form-item-gi>
         </n-grid>
@@ -200,7 +209,7 @@ onMounted(() => {
                     handleInput(' ')
                   }"
                   @input="(name) => {
-                    userApi.searchUser({ name }).then((res) => {
+                    userApi.searchUser({ name: name.trimStart() }).then((res) => {
                       searchUserResult = res.data.records ?? []
                     }).catch(e => {
                       searchUserResult = []

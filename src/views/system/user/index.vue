@@ -27,17 +27,17 @@ const pagination = reactive<PaginationProps>({
 
 const formRef = ref<FormInst | null>(null)
 const rules: FormRules = {
-  no: { required: true, trigger: ['input', 'blur'] },
-  name: { required: true, trigger: ['input', 'blur'] },
+  no: { required: true, trigger: ['input', 'blur'], validator: (rule: FormItemRule, value?: string) => value === undefined || value === '' ? Promise.reject(Error('工号不能为空')) : true },
+  name: { required: true, trigger: ['input', 'blur'], validator: (rule: FormItemRule, value?: string) => value === undefined || value === '' ? Promise.reject(Error('名称不能为空')) : true },
   departmentId: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('部门不能为空')) : true,
   },
   roleId: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('角色不能为空')) : true,
   },
   email: {
     required: true,
@@ -48,11 +48,11 @@ const rules: FormRules = {
     trigger: ['input', 'blur'],
     validator: (rule: FormItemRule, value: string) => !/[1][3,4,5,7,8][0-9]{9}/.test(value) ? Promise.reject(Error('手机号格式有误')) : true,
   },
-  seat: { required: true, trigger: ['input', 'blur'] },
+  seat: { required: true, trigger: ['input', 'blur'], validator: (rule: FormItemRule, value?: string) => value === undefined || value === '' ? Promise.reject(Error('座位不能为空')) : true },
   status: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('状态不能为空')) : true,
   },
 }
 
@@ -182,7 +182,7 @@ const columns: DataTableColumns<RowData> = [
             style: { marginLeft: '10px' },
             onClick: () => {
               editModalMode.value = 2
-              editModal.value = row
+              editModal.value = JSON.parse(JSON.stringify(row))
               showEditModal.value = true
             },
           },
@@ -256,7 +256,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card h-full>
+  <n-card style="min-height: 100%">
     <div bg-white w-full>
       <n-form
         label-placement="left"
@@ -301,6 +301,19 @@ onMounted(() => {
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
             </NButton>
+            <NButton
+              ml="10" type="primary" @click="() => {
+                queryForm = {
+                  name: '',
+                  status: null,
+                  phone: null,
+                  startDate: null,
+                  endDate: null,
+                }
+              }"
+            >
+              重置
+            </NButton>
           </n-form-item-gi>
         </n-grid>
         <NButton
@@ -319,6 +332,7 @@ onMounted(() => {
           inline
           abstract
           action="/service/user/import"
+
           @before-upload="() => {
             importBtnDisable = true
           }"
@@ -328,7 +342,7 @@ onMounted(() => {
           }"
         >
           <n-upload-trigger #="{ handleClick }" abstract>
-            <NButton :loading="importBtnDisable" type="primary" @click="handleClick">
+            <NButton :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')" :loading="importBtnDisable" type="primary" @click="handleClick">
               批量导入
             </NButton>
             <n-upload-file-list hidden />
@@ -358,7 +372,9 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="editModal" :rules="rules" :validate-messages="{ required: '该项不能为空' }">
+        <n-form
+          ref="formRef" :model="editModal" :rules="rules"
+        >
           <n-form-item v-if="editModalMode !== 1" path="no" label="工号">
             <NInput v-model:value="editModal.no" :disabled="userInfo.role[0] !== 'admin'" @keydown.enter.prevent />
           </n-form-item>

@@ -101,32 +101,52 @@ const formatRepeatedProbability: {
 
 const formRef = ref<FormInst | null>(null)
 const rules: FormRules = {
-  title: { required: true, trigger: ['input', 'blur'] },
+  title: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: string) => value === undefined || value === '' ? Promise.reject(Error('标题不能为空')) : true,
+  },
   type: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('类型不能为空')) : true,
   },
   priority: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('优先级不能为空')) : true,
   },
   level: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('严重程度不能为空')) : true,
   },
   repeatedProbability: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('重复程度不能为空')) : true,
   },
   status: {
     required: true,
     trigger: ['input', 'blur'],
-    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('该项不能为空')) : true,
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('状态不能为空')) : true,
   },
+  reportUserId: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('报告人不能为空')) : true,
+  },
+  userId: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: number) => value === undefined ? Promise.reject(Error('经办人不能为空')) : true,
+  },
+  description: {
+    required: true,
+    trigger: ['input', 'blur'],
+    validator: (rule: FormItemRule, value?: string) => value === undefined || value === '' ? Promise.reject(Error('经办人不能为空')) : true,
+  },
+
 }
 
 const queryForm = ref<DefectSearchParam>({})
@@ -215,7 +235,9 @@ const columns: DataTableColumns<RowData> = [
     ellipsis: { tooltip: true },
     render: row => row.user?.name ?? '-',
   },
-  { title: '缺陷描述', key: 'comment', width: 150, ellipsis: { tooltip: true } },
+  { title: '缺陷描述', key: 'description', width: 150, ellipsis: { tooltip: true } },
+  { title: '备注', key: 'comment', width: 150, ellipsis: { tooltip: true } },
+
   {
     title: '状态',
     key: 'status',
@@ -241,7 +263,7 @@ const columns: DataTableColumns<RowData> = [
             size: 'small',
             onClick: () => {
               editModalMode.value = 2
-              editModal.value = row
+              editModal.value = JSON.parse(JSON.stringify(row))
               showEditModal.value = true
             },
           },
@@ -290,7 +312,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card h-full>
+  <n-card style="min-height: 100%">
     <div bg-white w-full>
       <n-form
         label-placement="left"
@@ -354,6 +376,20 @@ onMounted(() => {
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
             </NButton>
+            <NButton
+              ml="10" type="primary" @click="() => {
+                queryForm = {
+                  title: null,
+                  level: null,
+                  priority: null,
+                  repeatedProbability: null,
+                  status: null,
+                  type: null,
+                }
+              }"
+            >
+              重置
+            </NButton>
           </n-form-item-gi>
         </n-grid>
         <NButton
@@ -386,7 +422,7 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="editModal" :rules="rules" :validate-messages="{ required: '该项不能为空' }">
+        <n-form ref="formRef" :model="editModal" :rules="rules">
           <n-form-item path="title" label="缺陷标题">
             <n-input v-model:value="editModal.title" :disabled="isDev" @keydown.enter.prevent />
           </n-form-item>
@@ -455,7 +491,7 @@ onMounted(() => {
                     handleInput(' ')
                   }"
                   @input="(name) => {
-                    userApi.searchUser({ name }).then((res) => {
+                    userApi.searchUser({ name: name.trimStart() }).then((res) => {
                       searchUserResult = res.data.records ?? []
                     }).catch(e => {
                       searchUserResult = []
@@ -487,7 +523,7 @@ onMounted(() => {
                     handleInput(' ')
                   }"
                   @input="(name) => {
-                    userApi.searchUser({ name }).then((res) => {
+                    userApi.searchUser({ name: name.trimStart() }).then((res) => {
                       searchUserResult2 = res.data.records ?? []
                     }).catch(e => {
                       searchUserResult2 = []
@@ -497,6 +533,9 @@ onMounted(() => {
                 />
               </template>
             </n-auto-complete>
+          </n-form-item>
+          <n-form-item path="description" label="描述">
+            <n-input v-model:value="editModal.description" :disabled="isDev" @keydown.enter.prevent />
           </n-form-item>
           <n-form-item path="comment" label="备注">
             <n-input v-model:value="editModal.comment" :disabled="isDev" @keydown.enter.prevent />

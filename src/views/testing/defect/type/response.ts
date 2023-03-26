@@ -43,4 +43,6 @@ export interface DefectVo {
    * 经办人id
    */
   userId?: number
+
+  description?: string
 }

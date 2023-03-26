@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { removeToken } from '@/utils/auth/token'
 import { toLogin } from '@/utils/auth/router'
+import { useTabStore } from '@/store'
 
 interface UserInfo {
   id?: number
@@ -78,9 +79,11 @@ export const useUserStore = defineStore('user', {
       }
     },
     async logout() {
+      const tabStore = useTabStore()
       removeToken()
       sessionStorage.removeItem('userInfo')
       this.userInfo = {}
+      tabStore.removeAll()
       toLogin()
     },
     setUserInfo(userInfo = {}) {

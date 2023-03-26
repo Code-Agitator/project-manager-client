@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DataTableColumns, UploadFileInfo } from 'naive-ui'
+import type { DataTableColumns, FormInst, UploadFileInfo } from 'naive-ui'
 import { NButton } from 'naive-ui'
 import type { PaginationProps } from 'naive-ui/es/pagination'
 import { h } from 'vue'
@@ -9,6 +9,7 @@ import type { TestingPlanVo } from '@/views/testing/plan/type/response'
 import type { TestingPlanSearchDto } from '@/views/testing/plan/type/request'
 import type { UserVo } from '@/views/system/user/type/response'
 import { useUserStore } from '@/store'
+import defectApi from '@/views/testing/defect/api'
 
 const editModalMode = ref<number>(1)
 const tableData = ref<RowData[]>([])
@@ -69,20 +70,24 @@ const handleDeletePlan = async (id?: number) => {
     window.$message?.error('删除失败')
   }
 }
-
+const formRef = ref<FormInst | null>(null)
 const handelSaveBtnClick = async () => {
-  try {
-    if (editModalMode.value === 1)
-      await api.savePlan(editModal.value)
-    else
-      await api.updatePlan(editModal.value)
-    window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
-    showEditModal.value = false
-    initTableData()
-  }
-  catch (e) {
-    window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
-  }
+  formRef.value?.validate(async (errors) => {
+    if (!errors) {
+      try {
+        if (editModalMode.value === 1)
+          await api.savePlan(editModal.value)
+        else
+          await api.updatePlan(editModal.value)
+        window.$message?.success(editModalMode.value === 1 ? '新增成功' : '修改成功')
+        showEditModal.value = false
+        initTableData()
+      }
+      catch (e) {
+        window.$message?.error(editModalMode.value === 1 ? '新增失败' : '修改失败')
+      }
+    }
+  })
 }
 const columns: DataTableColumns<RowData> = [
   { title: '计划编号', key: 'id', width: 60, ellipsis: { tooltip: true } },
@@ -112,7 +117,7 @@ const columns: DataTableColumns<RowData> = [
             disabled: !(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major'),
             onClick: () => {
               editModalMode.value = 2
-              editModal.value = row
+              editModal.value = JSON.parse(JSON.stringify(row))
               showEditModal.value = true
               row.user?.name && (selectedUserName.value = row.user.name)
             },
@@ -147,7 +152,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card h-full>
+  <n-card style="min-height: 100%">
     <div bg-white w-full>
       <n-form
         label-placement="left"
@@ -195,7 +200,7 @@ onMounted(() => {
                     handleInput(' ')
                   }"
                   @input="(name) => {
-                    userApi.searchUser({ name }).then((res) => {
+                    userApi.searchUser({ name: name.trimStart() }).then((res) => {
                       searchUserResultInQuery = res.data.records ?? []
                     }).catch(e => {
                       searchUserResultInQuery = []
@@ -209,6 +214,19 @@ onMounted(() => {
           <n-form-item-gi>
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
+            </NButton>
+            <NButton
+              ml="10" type="primary" @click="() => {
+                selectedUserNameInQuery = null
+                queryForm = {
+                  name: null,
+                  userId: null,
+                  startTime: null,
+                  endTime: null,
+                }
+              }"
+            >
+              重置
             </NButton>
           </n-form-item-gi>
         </n-grid>
@@ -242,7 +260,9 @@ onMounted(() => {
         style="width: 600px" :title="editModalMode === 1 ? '新增' : '更新'" size="huge" role="dialog"
         aria-modal="true" closable @close="showEditModal = false"
       >
-        <n-form ref="formRef" :model="editModal">
+        <n-form
+          ref="formRef" :model="editModal"
+        >
           <n-form-item path="title" label="计划名称">
             <n-input v-model:value="editModal.name" @keydown.enter.prevent />
           </n-form-item>
@@ -275,7 +295,7 @@ onMounted(() => {
                     handleInput(' ')
                   }"
                   @input="(name) => {
-                    userApi.searchUser({ name }).then((res) => {
+                    userApi.searchUser({ name: name.trimStart() }).then((res) => {
                       searchUserResult = res.data.records ?? []
                     }).catch(e => {
                       searchUserResult = []

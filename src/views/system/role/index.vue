@@ -89,7 +89,7 @@ const columns: DataTableColumns<RowData> = [
             disabled: row.id === 1,
             onClick: () => {
               editModalMode.value = 2
-              editModal.value = row
+              editModal.value = JSON.parse(JSON.stringify(row))
               showEditModal.value = true
               transferValue.value = JSON.parse(row.menu ?? '[]')
             },
@@ -143,7 +143,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card h-full>
+  <n-card style="min-height: 100%">
     <div bg-white w-full>
       <n-form
         label-placement="left"
@@ -159,6 +159,16 @@ onMounted(() => {
           <n-form-item-gi>
             <NButton ml="10" type="primary" @click="initTableData">
               搜索
+            </NButton>
+            <NButton
+              ml="10" type="primary" @click="() => {
+                queryForm = {
+                  roleName: null,
+                  roleCode: null,
+                }
+              }"
+            >
+              重置
             </NButton>
           </n-form-item-gi>
         </n-grid>
