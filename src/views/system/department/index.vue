@@ -148,7 +148,7 @@ onMounted(() => {
             <NButton
               ml="10" type="primary" @click="() => {
                 queryForm = {
-                  keywords: '',
+                  keywords: undefined,
                 }
               }"
             >

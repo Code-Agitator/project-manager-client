@@ -266,9 +266,9 @@ onMounted(() => {
                 selectedPlanNameInQuery = null
                 selectedUserNameInQuery = null
                 queryForm = {
-                  plantId: null,
-                  userId: null,
-                  name: null,
+                  plantId: undefined,
+                  userId: undefined,
+                  name: undefined,
                 }
               }"
             >

@@ -219,10 +219,10 @@ onMounted(() => {
               ml="10" type="primary" @click="() => {
                 selectedUserNameInQuery = null
                 queryForm = {
-                  name: null,
-                  userId: null,
-                  startTime: null,
-                  endTime: null,
+                  name: undefined,
+                  userId: undefined,
+                  startTime: undefined,
+                  endTime: undefined,
                 }
               }"
             >

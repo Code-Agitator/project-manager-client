@@ -379,13 +379,15 @@ onMounted(() => {
             <NButton
               ml="10" type="primary" @click="() => {
                 queryForm = {
-                  title: null,
-                  level: null,
-                  priority: null,
-                  repeatedProbability: null,
-                  status: null,
-                  type: null,
+                  title: undefined,
+                  level: undefined,
+                  priority: undefined,
+                  repeatedProbability: undefined,
+                  status: undefined,
+                  type: undefined,
                 }
+                if (isDev)
+                  queryForm.userId = userInfo.userId
               }"
             >
               重置

@@ -163,8 +163,8 @@ onMounted(() => {
             <NButton
               ml="10" type="primary" @click="() => {
                 queryForm = {
-                  roleName: null,
-                  roleCode: null,
+                  roleName: undefined,
+                  roleCode: undefined,
                 }
               }"
             >

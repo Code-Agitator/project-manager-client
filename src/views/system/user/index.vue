@@ -304,12 +304,14 @@ onMounted(() => {
             <NButton
               ml="10" type="primary" @click="() => {
                 queryForm = {
-                  name: '',
-                  status: null,
-                  phone: null,
-                  startDate: null,
-                  endDate: null,
+                  name: undefined,
+                  status: undefined,
+                  phone: undefined,
+                  startDate: undefined,
+                  endDate: undefined,
                 }
+                if (userInfo.role[0] === 'major')
+                  queryForm.departmentId = userInfo.departmentId as unknown as number
               }"
             >
               重置
