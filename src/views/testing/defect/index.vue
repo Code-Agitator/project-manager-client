@@ -22,7 +22,8 @@ const pagination = reactive<PaginationProps>({
 })
 const userInfo = useUserStore()
 const isDev = userInfo.role[0] === 'dev'
-
+const isMajor = userInfo.role[0] === 'major'
+const isTest = userInfo.role[0] === 'test'
 const selectedUserName = ref<string>('')
 const searchUserResult = ref<UserVo[]>([])
 const autoCompleteOptions = computed(() => searchUserResult.value?.map((user) => {
@@ -300,10 +301,11 @@ const getDepartmentList = async () => {
 }
 getDepartmentList()
 onMounted(() => {
-  initTableData()
   if (isDev)
     queryForm.value.userId = userInfo.userId
-
+  else if (isMajor || isTest)
+    queryForm.value.reportUserId = userInfo.userId
+  initTableData()
   pagination.onUpdatePage = (page) => {
     pagination.page = page
     initTableData()
@@ -387,7 +389,9 @@ onMounted(() => {
                   type: undefined,
                 }
                 if (isDev)
-                  queryForm.userId = userInfo.userId
+                  queryForm.value.userId = userInfo.userId
+                else if (isMajor || isTest)
+                  queryForm.value.reportUserId = userInfo.userId
               }"
             >
               重置
