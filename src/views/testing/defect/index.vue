@@ -389,9 +389,9 @@ onMounted(() => {
                   type: undefined,
                 }
                 if (isDev)
-                  queryForm.value.userId = userInfo.userId
+                  queryForm.userId = userInfo.userId
                 else if (isMajor || isTest)
-                  queryForm.value.reportUserId = userInfo.userId
+                  queryForm.reportUserId = userInfo.userId
               }"
             >
               重置
