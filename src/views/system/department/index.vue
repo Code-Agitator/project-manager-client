@@ -148,8 +148,9 @@ onMounted(() => {
             <NButton
               ml="10" type="primary" @click="() => {
                 queryForm = {
-                  keywords: undefined,
+                  keywords: '',
                 }
+                initTableData()
               }"
             >
               重置

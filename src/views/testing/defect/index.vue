@@ -381,17 +381,18 @@ onMounted(() => {
             <NButton
               ml="10" type="primary" @click="() => {
                 queryForm = {
-                  title: undefined,
-                  level: undefined,
-                  priority: undefined,
-                  repeatedProbability: undefined,
-                  status: undefined,
-                  type: undefined,
+                  title: '',
+                  level: null,
+                  priority: null,
+                  repeatedProbability: null,
+                  status: null,
+                  type: null,
                 }
                 if (isDev)
                   queryForm.userId = userInfo.userId
                 else if (isMajor || isTest)
                   queryForm.reportUserId = userInfo.userId
+                initTableData()
               }"
             >
               重置

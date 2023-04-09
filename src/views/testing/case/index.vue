@@ -266,10 +266,11 @@ onMounted(() => {
                 selectedPlanNameInQuery = null
                 selectedUserNameInQuery = null
                 queryForm = {
-                  plantId: undefined,
-                  userId: undefined,
-                  name: undefined,
+                  plantId: '',
+                  userId: '',
+                  name: '',
                 }
+                initTableData()
               }"
             >
               重置

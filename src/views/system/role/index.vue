@@ -163,9 +163,10 @@ onMounted(() => {
             <NButton
               ml="10" type="primary" @click="() => {
                 queryForm = {
-                  roleName: undefined,
-                  roleCode: undefined,
+                  roleName: '',
+                  roleCode: '',
                 }
+                initTableData()
               }"
             >
               重置

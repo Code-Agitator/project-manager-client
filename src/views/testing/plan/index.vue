@@ -149,6 +149,17 @@ onMounted(() => {
     initTableData()
   }
 })
+
+const resetSearchForm = () => {
+  selectedUserNameInQuery.value = ''
+  queryForm.value = {
+    name: '',
+    userId: undefined,
+    startTime: null,
+    endTime: null,
+  }
+  initTableData()
+}
 </script>
 
 <template>
@@ -217,13 +228,14 @@ onMounted(() => {
             </NButton>
             <NButton
               ml="10" type="primary" @click="() => {
-                selectedUserNameInQuery = null
+                selectedUserNameInQuery = ''
                 queryForm = {
-                  name: undefined,
+                  name: '',
                   userId: undefined,
-                  startTime: undefined,
-                  endTime: undefined,
+                  startTime: null,
+                  endTime: null,
                 }
+                initTableData()
               }"
             >
               重置
