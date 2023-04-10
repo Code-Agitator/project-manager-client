@@ -5,6 +5,7 @@ import type { PaginationProps } from 'naive-ui/es/pagination'
 import md5 from 'md5'
 import type { FormRules } from 'naive-ui/es/form/src/interface'
 import { saveAs } from 'file-saver'
+import type { SelectMixedOption } from 'naive-ui/es/select/src/interface'
 import { timeFormat } from '@/utils/common'
 import api from '@/views/system/user/api'
 import departmentApi from '@/views/system/department/api'
@@ -24,6 +25,7 @@ const editModalWidth = '600px'
 const pagination = reactive<PaginationProps>({
   pageSize: 10,
 })
+const roleOptions = ref<SelectMixedOption[]>([])
 
 const formRef = ref<FormInst | null>(null)
 const rules: FormRules = {
@@ -184,6 +186,9 @@ const columns: DataTableColumns<RowData> = [
               editModalMode.value = 2
               editModal.value = JSON.parse(JSON.stringify(row))
               showEditModal.value = true
+              roleOptions.value = [
+                { label: '超级管理', value: 1 }, { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 }, { label: '主管', value: 4 },
+              ]
             },
           },
           { default: () => '修改' },
@@ -248,6 +253,9 @@ onMounted(() => {
   if (role === 'major')
     queryForm.value.departmentId = userInfo.departmentId as unknown as number
   initTableData()
+  roleOptions.value = [
+    { label: '超级管理', value: 1, disabled: role === 'major' }, { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 }, { label: '主管', value: 4, disabled: role === 'major' },
+  ]
   pagination.onUpdatePage = (page) => {
     pagination.page = page
     initTableData()
@@ -325,8 +333,15 @@ onMounted(() => {
           mr="10"
           @click="() => {
             editModalMode = 1
-            editModal = {}
+            editModal = {
+              departmentId: userInfo.role[0] === 'major' ? userInfo.departmentId : null,
+            }
             showEditModal = true
+            if (userInfo.role[0] === 'major') {
+              roleOptions = [
+                { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 },
+              ]
+            }
           }"
         >
           + 新增
@@ -394,9 +409,7 @@ onMounted(() => {
           <n-form-item path="roleId" label="角色">
             <n-select
               v-model:value="editModal.roleId"
-              :disabled="!(userInfo.role[0] === 'admin' || userInfo.role[0] === 'major')" :options="[
-                { label: '超级管理', value: 1 }, { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 }, { label: '主管', value: 4 },
-              ]"
+              :disabled="!(userInfo.role[0] === 'admin' || (userInfo.role[0] === 'major' && (editModal.roleId === 2 || editModal.roleId === 3 || editModal.roleId === null || editModal.roleId === undefined)))" :options="roleOptions"
             />
           </n-form-item>
           <n-form-item path="email" label="邮箱">
