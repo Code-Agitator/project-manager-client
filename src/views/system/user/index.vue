@@ -187,7 +187,7 @@ const columns: DataTableColumns<RowData> = [
               editModal.value = JSON.parse(JSON.stringify(row))
               showEditModal.value = true
               roleOptions.value = [
-                { label: '超级管理', value: 1 }, { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 }, { label: '主管', value: 4 },
+                { label: '超级管理', value: 1, disabled: role === 'major' }, { label: '测试人员', value: 2 }, { label: '开发人员', value: 3 }, { label: '主管', value: 4, disabled: role === 'major' },
               ]
             },
           },
